@@ -16,6 +16,9 @@ public class NetworkManager : MonoBehaviour {
 	[SerializeField] InputField messageWindow;
 	[SerializeField] Text kills;
 	[SerializeField] Text deaths;
+	List<int> deathCount = new List<int> ();
+	List<int> killCount = new List<int> ();
+	GameObject[] players;
 
 	GameObject player;
 	Queue<string> messages;
@@ -32,6 +35,8 @@ public class NetworkManager : MonoBehaviour {
 		//connect to Server with setup info and sets game version
 		PhotonNetwork.ConnectUsingSettings ("0.4");
 		StartCoroutine("UpdateConnectionString");
+
+		players = GameObject.FindGameObjectsWithTag ("Player");
 	}
 	
 	// Update is called once per frame
@@ -79,6 +84,7 @@ public class NetworkManager : MonoBehaviour {
 		sceneCamera.enabled = true; 
 		StartCoroutine ("SpawnPlayer", respawnTime);
 		AddMessage ("Player " + PhotonNetwork.player.name + " has spawned.");
+		//playerStats.Add(new Player(PhotonNetwork.player.name, 0, 0)); 
 	}
 
 	IEnumerator SpawnPlayer(float respawnTime){
@@ -90,6 +96,7 @@ public class NetworkManager : MonoBehaviour {
 		player = PhotonNetwork.Instantiate ("FPSPlayer", spawnPoints[index].position, spawnPoints[index].rotation, 0);
 		//Once Player dies on network it will call Respawn me which will then call StartSpawn
 		player.GetComponent<PlayerNetworkMover> ().RespawnMe += StartSpawnProcess;
+		player.GetComponent<PlayerNetworkMover> ().ScoreStats += onDeath;
 		player.GetComponent<PlayerNetworkMover> ().SendNetworkMessage += AddMessage;//"Subscribe" to it
 		sceneCamera.enabled = false;
 	}
@@ -110,10 +117,25 @@ public class NetworkManager : MonoBehaviour {
 			messageWindow.text += m + "\n"; 		
 		}
 	}
+
+	void onDeath(string name){
+
+		Debug.Log ("DEATH!");
+		for(int i = 0; i < players.Length; i++){
+			
+			if(players[i].GetComponent<PlayerNetworkMover>().playerName == name){
+				players[i].GetComponent<PlayerNetworkMover>().deaths++;
+				photonView.RPC ("Score_RPC", PhotonTargets.All, players[i].GetComponent<PlayerNetworkMover>().kills, players[i].GetComponent<PlayerNetworkMover>().deaths++);
+				Debug.Log (players[i].GetComponent<PlayerNetworkMover>().playerName+ " Death Count: " + players[i].GetComponent<PlayerNetworkMover>().deaths++);
+			}
+		}
+	}
+
 	[RPC]
 	void Score_RPC(string killss, string deathss){
 
 		kills.text = killss; 
 		deaths.text = deathss; 
 	}
+
 }

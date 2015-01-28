@@ -28,7 +28,6 @@ GameObject:
   - 20: {fileID: 2036684}
   - 124: {fileID: 12436684}
   - 92: {fileID: 9236684}
-  - 81: {fileID: 8136684}
   - 114: {fileID: 11436688}
   m_Layer: 10
   m_Name: WeaponsCam
@@ -494,20 +493,13 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!81 &8136684
-AudioListener:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 136686}
-  m_Enabled: 0
 --- !u!81 &8136686
 AudioListener:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 136698}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!82 &8232322
 AudioSource:
   m_ObjectHideFlags: 1
@@ -682,6 +674,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a6c62a618b349e43ac067b9f05e9210, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerName: 
+  kills: 0
+  deaths: 0
   AKFire: {fileID: 8300000, guid: eb19c101e680075468ddaa277d8450f3, type: 3}
 --- !u!114 &11436688
 MonoBehaviour:
@@ -791,7 +786,6 @@ MonoBehaviour:
   - {fileID: 8300000, guid: e9714160ce34f2b4ab63ff8c27bd68e1, type: 3}
   _jumpSound: {fileID: 8300000, guid: 5897aeed9b676024fbb8c694b421a861, type: 3}
   _landSound: {fileID: 8300000, guid: 3b09d59f4499d45428baa7a21e954296, type: 3}
-  TabPanel: {fileID: 0}
 --- !u!124 &12436684
 Behaviour:
   m_ObjectHideFlags: 1

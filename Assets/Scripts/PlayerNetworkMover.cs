@@ -7,11 +7,16 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	public event Respawn RespawnMe;
 	public delegate void SendMessage(string message);
 	public event SendMessage SendNetworkMessage;
+	public delegate void Score(string playerName);
+	public event Score ScoreStats;
 
 	Vector3 position;
 	Quaternion rotation;
 	float smoothing = 10f;
 	float health = 100f;
+	public string playerName; 
+	public int kills = 0;
+	public int deaths = 0; 
 	GameObject[] weapons;
 	bool aim = false;
 	bool sprint = false;
@@ -35,7 +40,9 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		//audio = GetComponentInChildren<AudioSource> ();
 		//If its my player, not anothers
 		if (photonView.isMine) {
-			//enable each script for player behavior
+			gameObject.name = PhotonNetwork.player.name;
+			playerName = PhotonNetwork.player.name;
+			//enable each script just for the player being spawned and not the others
 			rigidbody.useGravity = true; 
 			GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().enabled = true;
 			GetComponentInChildren<PlayerShooting>().enabled = true;
@@ -43,7 +50,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 				cam.enabled = true; 
 			}
 			foreach(AudioListener AL in GetComponentsInChildren<AudioListener>()){
-				//AL.enabled = true; 
+				AL.enabled = true; 
 			}
 			//transform.Find ("FirstPersonCharacter/WeaponsCam/Ak-47").gameObject.layer = 10;
 			weapons = GameObject.FindGameObjectsWithTag("AK");
@@ -112,6 +119,8 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			//Subscribe to the event so that when a player dies 3 sec later respawn
 			if(RespawnMe != null)
 				RespawnMe(3f);
+			if(ScoreStats != null)
+				ScoreStats(PhotonNetwork.player.name);
 			//Only owner can remove themselves
 			PhotonNetwork.Destroy(gameObject);
 		}
