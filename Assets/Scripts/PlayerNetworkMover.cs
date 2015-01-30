@@ -23,19 +23,20 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	bool initialLoad = true;
 	bool isShooting = false; 
 	public AudioClip AKFire;
-
+	//CharacterController cc;
 	AudioSource audio0;
 	AudioSource audio1;
 	AudioSource[] aSources;
 	Animator anim;
+
 	//AudioSource audio;
 	// Use this for initialization
 	void Start () {
-
+		//cc = GetComponent<CharacterController>();
 		aSources = GetComponents<AudioSource> (); 
 		audio0 = aSources [0];
 		audio1 = aSources [1];
-
+		//cc.enabled = false;
 		anim = GetComponentInChildren<Animator> ();
 		//audio = GetComponentInChildren<AudioSource> ();
 		//If its my player, not anothers
@@ -52,6 +53,10 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			foreach(AudioListener AL in GetComponentsInChildren<AudioListener>()){
 				AL.enabled = true; 
 			}
+			//GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().isDead = false; 
+			//foreach(CharacterController CharCon in GetComponentsInChildren<CharacterController>()){
+			//	CharCon.enabled = true; 
+			//}
 			//transform.Find ("FirstPersonCharacter/WeaponsCam/Ak-47").gameObject.layer = 10;
 			weapons = GameObject.FindGameObjectsWithTag("AK");
 			for(int i = 0; i < weapons.Length; i++){

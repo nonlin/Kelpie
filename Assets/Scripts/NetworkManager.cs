@@ -18,7 +18,8 @@ public class NetworkManager : MonoBehaviour {
 	[SerializeField] Text deaths;
 	List<int> deathCount = new List<int> ();
 	List<int> killCount = new List<int> ();
-	GameObject[] players;
+	public List<Player> players = new List<Player> ();
+	public GameObject[] playersGO;
 
 	GameObject player;
 	Queue<string> messages;
@@ -36,9 +37,12 @@ public class NetworkManager : MonoBehaviour {
 		PhotonNetwork.ConnectUsingSettings ("0.4");
 		StartCoroutine("UpdateConnectionString");
 
-		players = GameObject.FindGameObjectsWithTag ("Player");
+		//playersGO = GameObject.FindGameObjectsWithTag ("Player");
 	}
-	
+	void Update(){
+
+
+	}
 	// Update is called once per frame
 	IEnumerator UpdateConnectionString () {
 
@@ -77,6 +81,8 @@ public class NetworkManager : MonoBehaviour {
 		connectionText.text = "";
 		StartSpawnProcess (0f);
 		AddMessage ("Player " + PhotonNetwork.player.name + " has joined.");
+
+
 	}
 
 	void StartSpawnProcess (float respawnTime){
@@ -85,6 +91,7 @@ public class NetworkManager : MonoBehaviour {
 		StartCoroutine ("SpawnPlayer", respawnTime);
 		AddMessage ("Player " + PhotonNetwork.player.name + " has spawned.");
 		//playerStats.Add(new Player(PhotonNetwork.player.name, 0, 0)); 
+
 	}
 
 	IEnumerator SpawnPlayer(float respawnTime){
@@ -99,6 +106,15 @@ public class NetworkManager : MonoBehaviour {
 		player.GetComponent<PlayerNetworkMover> ().ScoreStats += onDeath;
 		player.GetComponent<PlayerNetworkMover> ().SendNetworkMessage += AddMessage;//"Subscribe" to it
 		sceneCamera.enabled = false;
+		playersGO = GameObject.FindGameObjectsWithTag ("Player");
+		Debug.Log ("Player COUNT " + players.Count + playersGO.Length);
+		for(int i = 0; i < playersGO.Length; i++){
+			//if(!players[i].playerName.Contains(PhotonNetwork.player.name)){
+			players.Add (new Player( playersGO[i], PhotonNetwork.player.name,0,0)); 
+			Debug.Log ("Player "+ players[i].playerName + " Added to list" ); 
+			Debug.Log ("Player COunt " + players.Count + playersGO.Length);
+			//}
+		}
 	}
 
 	void AddMessage(string message){
@@ -121,7 +137,7 @@ public class NetworkManager : MonoBehaviour {
 	void onDeath(string name){
 
 		Debug.Log ("DEATH!");
-		for(int i = 0; i < players.Length; i++){
+		for(int i = 0; i < players.Count; i++){
 			
 			if(players[i].GetComponent<PlayerNetworkMover>().playerName == name){
 				players[i].GetComponent<PlayerNetworkMover>().deaths++;
@@ -138,4 +154,18 @@ public class NetworkManager : MonoBehaviour {
 		deaths.text = deathss; 
 	}
 
+	void OnApplicationQuit() {
+		PhotonNetwork.Disconnect ();
+	}
+
+	void OnPhotonPlayerDisconnected(PhotonPlayer playerDC){
+		for (int i = 0; i < players.Count; i++) {
+			Debug.Log ("Server CountB " + players.Count);
+			if(players[i].playerName == playerDC.name){
+				players.RemoveAt (i);
+				Debug.Log ("Server CountA " + players.Count);
+			}
+		}
+		AddMessage ("Player " + playerDC.name + " disconnected.");
+	}
 }

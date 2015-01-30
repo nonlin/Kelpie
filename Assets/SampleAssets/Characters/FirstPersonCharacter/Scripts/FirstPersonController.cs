@@ -2,10 +2,11 @@
 using UnitySampleAssets.CrossPlatformInput;
 using UnitySampleAssets.Utility;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 namespace UnitySampleAssets.Characters.FirstPerson
 {
-    [RequireComponent(typeof (CharacterController))]
+    //[RequireComponent(typeof (CharacterController))]
     [RequireComponent(typeof (AudioSource))]
     public class FirstPersonController : MonoBehaviour
     {
@@ -32,7 +33,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
         [SerializeField] private AudioClip _jumpSound; // the sound played when character leaves the ground.
         [SerializeField] private AudioClip _landSound; // the sound played when character touches back on ground.
 
-		GameObject[] players;
+		NetworkManager NM;
 		Animator anim;
 		Animator tabAnim;
 		private GameObject TabPanel;
@@ -51,8 +52,10 @@ namespace UnitySampleAssets.Characters.FirstPerson
         private float _nextStep = 0f;
         private bool _jumping = false;
 
+		public bool isDead = true; 
 		void Awake(){
-			
+
+			NM = GetComponent<NetworkManager> ();
 			anim = GetComponentInChildren<Animator> ();
 			TabPanel = GameObject.Find ("Canvas/TabPanel");
 			tabAnim = TabPanel.GetComponent<Animator> ();
@@ -69,12 +72,14 @@ namespace UnitySampleAssets.Characters.FirstPerson
             _stepCycle = 0f;
             _nextStep = _stepCycle/2f;
             _jumping = false;
-			players = GameObject.FindGameObjectsWithTag("Player");
+			NM = GameObject.Find("NetworkManager").GetComponent<NetworkManager>(); 
+			//players = GameObject.FindGameObjectsWithTag("Player");
         }
 
         // Update is called once per frame
         private void Update()
         {
+
             RotateView();
             // the jump state needs to read here to make sure it is not missed
             if (!_jump)
@@ -83,8 +88,10 @@ namespace UnitySampleAssets.Characters.FirstPerson
             if (!_previouslyGrounded && _characterController.isGrounded)
             {
                 StartCoroutine(_jumpBob.DoBobCycle());
-				for(int i = 0; i < players.Length; i++){
-					players[i].GetComponent<PhotonView>().RPC ("PlayLandingSound",PhotonTargets.All); 
+				//Debug.Log (NM.players.Count);
+				for(int i = 0; i < NM.players.Count; i++){
+					NM.players[i].go.GetComponent<PhotonView>().RPC ("PlayLandingSound",PhotonTargets.All);
+					Debug.Log (NM.players[i].go.name);
 				}
                 //PlayLandingSound();
                 _moveDir.y = 0f;
@@ -131,8 +138,8 @@ namespace UnitySampleAssets.Characters.FirstPerson
                 if (_jump)
                 {
                     _moveDir.y = jumpSpeed;
-					for(int i = 0; i < players.Length; i++){
-						players[i].GetComponent<PhotonView>().RPC ("PlayJumpSound",PhotonTargets.All); 
+					for(int i = 0; i < NM.players.Count; i++){
+						NM.players[i].go.GetComponent<PhotonView>().RPC ("PlayJumpSound",PhotonTargets.All); 
 					}
                     //PlayJumpSound();
                     _jump = false;
@@ -165,10 +172,11 @@ namespace UnitySampleAssets.Characters.FirstPerson
             if (!(_stepCycle > _nextStep)) return;
 
             _nextStep = _stepCycle + _stepInterval;
-			for(int i = 0; i < players.Length; i++){
-				players[i].GetComponent<PhotonView>().RPC ("PlayFootStepAudio",PhotonTargets.All); 
+
+			for(int i = 0; i < NM.players.Count; i++){
+				NM.players[i].go.GetComponent<PhotonView>().RPC ("PlayFootStepAudio",PhotonTargets.All); 
 			}
-           // PlayFootStepAudio();
+            //PlayFootStepAudio();
         }
 		[RPC]
         public void PlayFootStepAudio()

@@ -10,7 +10,6 @@ GameObject:
   - 4: {fileID: 400000}
   - 95: {fileID: 9500000}
   - 54: {fileID: 5400000}
-  - 114: {fileID: 11400000}
   - 82: {fileID: 8200000}
   m_Layer: 0
   m_Name: door_exitOuter
@@ -259,20 +258,6 @@ Animator:
   m_ApplyRootMotion: 0
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 103f7ce59ffc7be468c1ad34f4d41f9c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  requireKey: 1
-  doorSwishClip: {fileID: 8300000, guid: 6be6df9c39e4b7f448d382605b849a08, type: 3}
-  accessDeniedClip: {fileID: 8300000, guid: 88f31fb977a578147854124d826dabb7, type: 3}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

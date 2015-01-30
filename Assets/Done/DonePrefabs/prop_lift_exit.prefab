@@ -95,8 +95,6 @@ GameObject:
   - 65: {fileID: 6500000}
   - 64: {fileID: 6400000}
   - 82: {fileID: 8200000}
-  - 114: {fileID: 11400000}
-  - 114: {fileID: 11400002}
   m_Layer: 0
   m_Name: prop_lift_exit
   m_TagString: Untagged
@@ -450,41 +448,6 @@ Animator:
   m_ApplyRootMotion: 1
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100010}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9e41f1aaa08509459a7a4eaf12334f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timeToDoorsClose: 2
-  timeToLiftStart: 2
-  timeToEndLevel: 6
-  liftSpeed: 3
-  player: {fileID: 0}
-  playerAnim: {fileID: 0}
-  hash: {fileID: 0}
-  camMovement: {fileID: 0}
-  sceneFadeInOut: {fileID: 0}
-  liftDoorsTracking: {fileID: 0}
-  playerInLift: 0
-  timer: 0
---- !u!114 &11400002
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82b53dbaa25a008428f537339bf53274, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  doorSpeed: 7
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

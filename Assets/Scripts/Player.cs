@@ -2,28 +2,21 @@
 using System.Collections;
 using System;
 
-public class Player : IComparable<Player> {
+public class Player : MonoBehaviour {
 
 	public string playerName;
 	public int deaths;
 	public int kills;
+	public GameObject go; 
 	
-	public Player(string name, int death, int kill){
-		
+	public Player(GameObject GO, string name, int death, int kill){
+
+		go = GO; 
 		playerName = name; 
 		deaths = death;
 		kills = kill; 
 
 	}
 
-	public int CompareTo(Player other)
-	{
-		if(other == null)
-		{
-			return 1;
-		}
-		
-		//Return the difference in power.
-		return kills - other.kills;
-	}
+
 }

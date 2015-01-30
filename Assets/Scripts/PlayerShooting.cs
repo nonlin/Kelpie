@@ -11,6 +11,7 @@ public class PlayerShooting : MonoBehaviour {
 	GameObject[] impacts;
 	GameObject[] impactHole;
 	GameObject[] players;
+	NetworkManager NM;
 	int currentImpact = 0;
 	int maxImpacts = 5;
 	bool shooting = false;
@@ -18,7 +19,7 @@ public class PlayerShooting : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-
+		NM = GameObject.Find ("NetworkManager").GetComponent<NetworkManager> ();
 		impacts = new GameObject[maxImpacts];
 		for (int i = 0; i < maxImpacts; i++){
 			impacts [i] = (GameObject)Instantiate (impactPrefab);
@@ -41,14 +42,15 @@ public class PlayerShooting : MonoBehaviour {
 			//anim.SetTrigger("Fire");
 			anim.SetBool("Fire",true);
 			shooting = true; 
-			for(int i = 0; i < players.Length; i++){
-				players[i].GetComponent<PhotonView>().RPC ("ShootingSound",PhotonTargets.All, true); 
+			for(int i = 0; i < NM.players.Count; i++){
+				NM.players[i].go.GetComponent<PhotonView>().RPC ("ShootingSound",PhotonTargets.All, true); 
 			}
 		}
 		else{
 			anim.SetBool("Fire",false);
 
 		}
+
 
 	}
 
