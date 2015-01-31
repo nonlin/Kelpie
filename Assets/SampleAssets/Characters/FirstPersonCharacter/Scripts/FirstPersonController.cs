@@ -90,7 +90,8 @@ namespace UnitySampleAssets.Characters.FirstPerson
                 StartCoroutine(_jumpBob.DoBobCycle());
 				//Debug.Log (NM.players.Count);
 				for(int i = 0; i < NM.players.Count; i++){
-					NM.players[i].go.GetComponent<PhotonView>().RPC ("PlayLandingSound",PhotonTargets.All);
+					if(NM.players[i] != null)
+						NM.players[i].go.GetComponent<PhotonView>().RPC ("PlayLandingSound",PhotonTargets.All);
 					Debug.Log (NM.players[i].go.name);
 				}
                 //PlayLandingSound();
@@ -105,14 +106,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
             _previouslyGrounded = _characterController.isGrounded;
 			TabMenu ();
         }
-		[RPC]
-        public void PlayLandingSound()
-        {
-            audio.clip = _landSound;
-            audio.Play();
-            _nextStep = _stepCycle + .5f;
 
-        }
 
         private void FixedUpdate()
         {
@@ -139,6 +133,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
                 {
                     _moveDir.y = jumpSpeed;
 					for(int i = 0; i < NM.players.Count; i++){
+						if(NM.players[i] != null)
 						NM.players[i].go.GetComponent<PhotonView>().RPC ("PlayJumpSound",PhotonTargets.All); 
 					}
                     //PlayJumpSound();
@@ -156,12 +151,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
             ProgressStepCycle(speed);
             UpdateCameraPosition(speed);
         }
-		[RPC]
-        public void PlayJumpSound()
-        {
-            audio.clip = _jumpSound;
-            audio.Play();
-        }
+
 
         private void ProgressStepCycle(float speed)
         {
@@ -174,23 +164,13 @@ namespace UnitySampleAssets.Characters.FirstPerson
             _nextStep = _stepCycle + _stepInterval;
 
 			for(int i = 0; i < NM.players.Count; i++){
+				if(NM.players[i] != null)
 				NM.players[i].go.GetComponent<PhotonView>().RPC ("PlayFootStepAudio",PhotonTargets.All); 
 			}
             //PlayFootStepAudio();
         }
-		[RPC]
-        public void PlayFootStepAudio()
-        {
-            if (!_characterController.isGrounded) return;
-            // pick & play a random footstep sound from the array,
-            // excluding sound at index 0
-            int n = Random.Range(1, _footstepSounds.Length);
-            audio.clip = _footstepSounds[n];
-            audio.PlayOneShot(audio.clip);
-            // move picked sound to index 0 so it's not picked next time
-            _footstepSounds[n] = _footstepSounds[0];
-            _footstepSounds[0] = audio.clip;
-        }
+
+
 
         private void UpdateCameraPosition(float speed)
         {

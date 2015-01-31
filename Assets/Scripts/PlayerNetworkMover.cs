@@ -23,16 +23,23 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	bool initialLoad = true;
 	bool isShooting = false; 
 	public AudioClip AKFire;
+	[SerializeField] private AudioClip _jumpSound; // the sound played when character leaves the ground.
+	[SerializeField] private AudioClip _landSound; // the sound played when character touches back on ground.
+	[SerializeField] private AudioClip[] _footstepSounds;
+	private CharacterController _characterController;
+	private float _stepCycle = 0f;
+	private float _nextStep = 0f;
 	//CharacterController cc;
 	AudioSource audio0;
 	AudioSource audio1;
 	AudioSource[] aSources;
 	Animator anim;
-
+	NetworkManager NM;
 	//AudioSource audio;
 	// Use this for initialization
 	void Start () {
 		//cc = GetComponent<CharacterController>();
+		NM = GameObject.Find ("NetworkManager").GetComponent<NetworkManager> ();
 		aSources = GetComponents<AudioSource> (); 
 		audio0 = aSources [0];
 		audio1 = aSources [1];
@@ -41,7 +48,9 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		//audio = GetComponentInChildren<AudioSource> ();
 		//If its my player, not anothers
 		if (photonView.isMine) {
-			gameObject.name = PhotonNetwork.player.name;
+
+			_characterController = GetComponent<CharacterController>();
+			//gameObject.name = PhotonNetwork.player.name;
 			playerName = PhotonNetwork.player.name;
 			//enable each script just for the player being spawned and not the others
 			rigidbody.useGravity = true; 
@@ -112,11 +121,25 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		}
 
 	}
+
 	[RPC]
 	public void GetShot(float damage, string enemyName){
 
 		health -= damage;
 		if (health <= 0 && photonView.isMine) {
+			//Use this to get current player this script is attached too
+			PhotonPlayer thisPlayer = PhotonNetwork.player;
+			//Then Get the number of players in the players list itterate through find the one who just died and remove it from list. 
+			for(int i = 0; i < NM.players.Count; i++){
+
+				Debug.Log ("Server CountB " + NM.players.Count);
+				Debug.Log ("Server List INFO " + PhotonNetwork.playerList.Length);
+				if(NM.players[i].ID == thisPlayer.ID){
+					Debug.Log ("ID CHOSEN____________" + NM.players[i].ID);
+					NM.players.RemoveAt (i);
+					Debug.Log ("Server CountA " + NM.players.Count);
+				}
+			}
 
 			if(SendNetworkMessage != null){
 				SendNetworkMessage(PhotonNetwork.player.name + " got owned by " + enemyName);
@@ -124,12 +147,13 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			//Subscribe to the event so that when a player dies 3 sec later respawn
 			if(RespawnMe != null)
 				RespawnMe(3f);
-			if(ScoreStats != null)
-				ScoreStats(PhotonNetwork.player.name);
+			//if(ScoreStats != null)
+			//	ScoreStats(PhotonNetwork.player.name);
 			//Only owner can remove themselves
 			PhotonNetwork.Destroy(gameObject);
 		}
 	}
+
 	[RPC]
 	public void ShootingSound(bool firing){
 
@@ -140,6 +164,38 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			audio1.Play();
 		}
 	}
+
+	[RPC]
+	public void PlayLandingSound()
+	{
+		audio.clip = _landSound;
+		audio.Play();
+		_nextStep = _stepCycle + .5f;
+		
+	}
+	
+	[RPC]
+	public void PlayJumpSound()
+	{
+		audio.clip = _jumpSound;
+		audio.Play();
+	}
+	
+	[RPC]
+	public void PlayFootStepAudio()
+	{
+		//if (!_characterController.isGrounded) return;
+		// pick & play a random footstep sound from the array,
+		// excluding sound at index 0
+		int n = Random.Range(1, _footstepSounds.Length);
+		audio.clip = _footstepSounds[n];
+		audio.PlayOneShot(audio.clip);
+		// move picked sound to index 0 so it's not picked next time
+		_footstepSounds[n] = _footstepSounds[0];
+		_footstepSounds[0] = audio.clip;
+	}
+
+
 	// Update is called once per frame
 	void Update () {
 	

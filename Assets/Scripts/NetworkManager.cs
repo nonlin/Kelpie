@@ -18,9 +18,8 @@ public class NetworkManager : MonoBehaviour {
 	[SerializeField] Text deaths;
 	List<int> deathCount = new List<int> ();
 	List<int> killCount = new List<int> ();
-	public List<Player> players = new List<Player> ();
-	public GameObject[] playersGO;
 
+	public List<Player> players = new List<Player> ();
 	GameObject player;
 	Queue<string> messages;
 	const int messageCount = 6;
@@ -37,12 +36,16 @@ public class NetworkManager : MonoBehaviour {
 		PhotonNetwork.ConnectUsingSettings ("0.4");
 		StartCoroutine("UpdateConnectionString");
 
-		//playersGO = GameObject.FindGameObjectsWithTag ("Player");
+		//playersGO = GameObject.FindGameObjectWithTag ("Player");
 	}
 	void Update(){
 
 
 	}
+	void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info){
+
+	}
+
 	// Update is called once per frame
 	IEnumerator UpdateConnectionString () {
 
@@ -72,6 +75,7 @@ public class NetworkManager : MonoBehaviour {
 		RoomOptions rm = new RoomOptions (){isVisible = true, maxPlayers = 10};
 		//Create a room called lobby, with rm settings using default lobby type
 		PhotonNetwork.JoinOrCreateRoom (roomName.text, rm, TypedLobby.Default);
+
 	}
 
 	void OnJoinedRoom(){
@@ -95,7 +99,7 @@ public class NetworkManager : MonoBehaviour {
 	}
 
 	IEnumerator SpawnPlayer(float respawnTime){
-
+		int i = 0;
 		yield return new WaitForSeconds(respawnTime);
 
 		int index = Random.Range (0, spawnPoints.Length);
@@ -103,18 +107,12 @@ public class NetworkManager : MonoBehaviour {
 		player = PhotonNetwork.Instantiate ("FPSPlayer", spawnPoints[index].position, spawnPoints[index].rotation, 0);
 		//Once Player dies on network it will call Respawn me which will then call StartSpawn
 		player.GetComponent<PlayerNetworkMover> ().RespawnMe += StartSpawnProcess;
-		player.GetComponent<PlayerNetworkMover> ().ScoreStats += onDeath;
+		//player.GetComponent<PlayerNetworkMover> ().ScoreStats += onDeath;
 		player.GetComponent<PlayerNetworkMover> ().SendNetworkMessage += AddMessage;//"Subscribe" to it
 		sceneCamera.enabled = false;
-		playersGO = GameObject.FindGameObjectsWithTag ("Player");
-		Debug.Log ("Player COUNT " + players.Count + playersGO.Length);
-		for(int i = 0; i < playersGO.Length; i++){
-			//if(!players[i].playerName.Contains(PhotonNetwork.player.name)){
-			players.Add (new Player( playersGO[i], PhotonNetwork.player.name,0,0)); 
-			Debug.Log ("Player "+ players[i].playerName + " Added to list" ); 
-			Debug.Log ("Player COunt " + players.Count + playersGO.Length);
-			//}
-		}
+		//Add player that just spawned to player list. 
+		players.Add (new Player( player, PhotonNetwork.player.name,0,0, PhotonNetwork.player.ID)); 
+		Debug.Log ("SpawnPlayer PhotonListSize " + PhotonNetwork.playerList.Length + " SpawnPlayer playersListSize " + players.Count);
 	}
 
 	void AddMessage(string message){
@@ -134,7 +132,7 @@ public class NetworkManager : MonoBehaviour {
 		}
 	}
 
-	void onDeath(string name){
+	/*void onDeath(string name){
 
 		Debug.Log ("DEATH!");
 		for(int i = 0; i < players.Count; i++){
@@ -145,7 +143,7 @@ public class NetworkManager : MonoBehaviour {
 				Debug.Log (players[i].GetComponent<PlayerNetworkMover>().playerName+ " Death Count: " + players[i].GetComponent<PlayerNetworkMover>().deaths++);
 			}
 		}
-	}
+	}*/
 
 	[RPC]
 	void Score_RPC(string killss, string deathss){
@@ -159,9 +157,12 @@ public class NetworkManager : MonoBehaviour {
 	}
 
 	void OnPhotonPlayerDisconnected(PhotonPlayer playerDC){
-		for (int i = 0; i < players.Count; i++) {
+
+		for(int i = 0; i < players.Count; i++){
+
 			Debug.Log ("Server CountB " + players.Count);
-			if(players[i].playerName == playerDC.name){
+			Debug.Log ("Server List INFO " + PhotonNetwork.playerList.Length);
+			if(players[i].ID == playerDC.ID){
 				players.RemoveAt (i);
 				Debug.Log ("Server CountA " + players.Count);
 			}
