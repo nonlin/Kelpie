@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerNetworkMover : Photon.MonoBehaviour {
 	//use events and delegates to know when someone has died, Secure with events
@@ -18,6 +19,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	public int kills = 0;
 	public int deaths = 0; 
 	GameObject[] weapons;
+
 	bool aim = false;
 	bool sprint = false;
 	bool initialLoad = true;
@@ -35,11 +37,18 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	AudioSource[] aSources;
 	Animator anim;
 	NetworkManager NM;
+	PhotonPlayer photonPlayer;
+	GameObject tempGO; 
+	Player tempPlayer;
+
 	//AudioSource audio;
 	// Use this for initialization
 	void Start () {
 		//cc = GetComponent<CharacterController>();
 		NM = GameObject.Find ("NetworkManager").GetComponent<NetworkManager> ();
+
+		//Use this to get current player this script is attached too
+		photonPlayer = PhotonNetwork.player;
 		aSources = GetComponents<AudioSource> (); 
 		audio0 = aSources [0];
 		audio1 = aSources [1];
@@ -62,19 +71,19 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			foreach(AudioListener AL in GetComponentsInChildren<AudioListener>()){
 				AL.enabled = true; 
 			}
-			//GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().isDead = false; 
-			//foreach(CharacterController CharCon in GetComponentsInChildren<CharacterController>()){
-			//	CharCon.enabled = true; 
-			//}
-			//transform.Find ("FirstPersonCharacter/WeaponsCam/Ak-47").gameObject.layer = 10;
 			weapons = GameObject.FindGameObjectsWithTag("AK");
 			for(int i = 0; i < weapons.Length; i++){
-				weapons[i].layer = 10; 
+				//If the weapon we find has the same ID as the player its attached to, set the tag to layer 10
+				if(weapons[i].GetComponentInParent<PlayerNetworkMover>().gameObject.GetInstanceID() == gameObject.GetInstanceID() )
+					weapons[i].layer = 10; 
 			}
+
 		}
 		else{
+		
 			StartCoroutine ("UpdateData");
 		}
+
 	}
 
 	IEnumerator UpdateData(){
@@ -106,7 +115,13 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			//Sync Animation States
 			stream.SendNext(anim.GetBool ("Aim"));
 			stream.SendNext(anim.GetBool ("Sprint"));
-			//stream.SendNext(isShooting);
+			stream.SendNext(deaths);
+			stream.SendNext(kills);
+
+
+			//stream.SendNext(deaths);
+
+		
 		}
 		else{
 			//Get from clients where they are
@@ -117,32 +132,22 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			//Sync Animation States
 			aim = (bool)stream.ReceiveNext();
 			sprint = (bool)stream.ReceiveNext();
-			//isShooting = (bool)stream.ReceiveNext();
+			deaths = (int)stream.ReceiveNext();
+			kills = (int)stream.ReceiveNext();
+			
 		}
-
+																												
 	}
 
 	[RPC]
-	public void GetShot(float damage, string enemyName){
-
+	public void GetShot(float damage, PhotonPlayer enemy){
+		//Take Damage and check for death
 		health -= damage;
 		if (health <= 0 && photonView.isMine) {
-			//Use this to get current player this script is attached too
-			PhotonPlayer thisPlayer = PhotonNetwork.player;
-			//Then Get the number of players in the players list itterate through find the one who just died and remove it from list. 
-			for(int i = 0; i < NM.players.Count; i++){
 
-				Debug.Log ("Server CountB " + NM.players.Count);
-				Debug.Log ("Server List INFO " + PhotonNetwork.playerList.Length);
-				if(NM.players[i].ID == thisPlayer.ID){
-					Debug.Log ("ID CHOSEN____________" + NM.players[i].ID);
-					NM.players.RemoveAt (i);
-					Debug.Log ("Server CountA " + NM.players.Count);
-				}
-			}
-
+			gameObject.GetComponent<PhotonView>().RPC ("RemoveOnDeath",PhotonTargets.All, photonPlayer.ID);
 			if(SendNetworkMessage != null){
-				SendNetworkMessage(PhotonNetwork.player.name + " got owned by " + enemyName);
+				SendNetworkMessage(PhotonNetwork.player.name + " got owned by " + enemy.name);
 			}
 			//Subscribe to the event so that when a player dies 3 sec later respawn
 			if(RespawnMe != null)
@@ -150,8 +155,42 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			//if(ScoreStats != null)
 			//	ScoreStats(PhotonNetwork.player.name);
 			//Only owner can remove themselves
+			int totalDeaths = (int)PhotonNetwork.player.customProperties["Deaths"];
+			totalDeaths ++;
+			ExitGames.Client.Photon.Hashtable setPlayerDeaths = new ExitGames.Client.Photon.Hashtable() {{"Deaths", totalDeaths}};
+			PhotonNetwork.player.SetCustomProperties(setPlayerDeaths);
+			//Search through player list and find the match of the player who killed and increment their kill counter
+
+		//	for(int i = 0; i < NM.players.Count; i++){
+
+			//	if(NM.players[i].ID == enemy.ID){
+					NM.player.GetComponent<PhotonView>().RPC ("Killed", PhotonTargets.All, enemy); 
+				//}
+			//}
+			//NM.players.Find (x => x.ID);
 			PhotonNetwork.Destroy(gameObject);
 		}
+		else if (health <= 0 && !photonView.isMine){
+
+			int totalKIlls = (int)PhotonNetwork.player.customProperties["Kills"];
+			totalKIlls ++;
+			ExitGames.Client.Photon.Hashtable setPlayerKills = new ExitGames.Client.Photon.Hashtable() {{"Kills", totalKIlls}};
+			PhotonNetwork.player.SetCustomProperties(setPlayerKills);
+		}
+	}
+
+	[RPC]
+	public void RemoveOnDeath(int photonPlayerID){
+
+		//Then Get the number of players in the players list itterate through find the one who just died and remove it from list. 
+
+	}
+
+	[RPC]
+	void Killed(PhotonPlayer killer){
+		if(photonView.isMine)
+			kills++;
+		
 	}
 
 	[RPC]

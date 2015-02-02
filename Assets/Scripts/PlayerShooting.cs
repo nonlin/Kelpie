@@ -42,9 +42,8 @@ public class PlayerShooting : MonoBehaviour {
 			//anim.SetTrigger("Fire");
 			anim.SetBool("Fire",true);
 			shooting = true; 
-			for(int i = 0; i < NM.players.Count; i++){
-				NM.players[i].go.GetComponent<PhotonView>().RPC ("ShootingSound",PhotonTargets.All, true); 
-			}
+
+			NM.player.GetComponent<PhotonView>().RPC ("ShootingSound",PhotonTargets.All,true);
 		}
 		else{
 			anim.SetBool("Fire",false);
@@ -65,7 +64,7 @@ public class PlayerShooting : MonoBehaviour {
 
 				if(hit.transform.tag == "Player"){
 					//Tell all we shot a player and call the RPC function GetShot passing damage runs on person shooting
-					hit.transform.GetComponent<PhotonView>().RPC ("GetShot", PhotonTargets.All, damage, PhotonNetwork.player.name); 
+					hit.transform.GetComponent<PhotonView>().RPC ("GetShot", PhotonTargets.All, damage, PhotonNetwork.player); 
 				}
 
 				impacts[currentImpact].transform.position = hit.point;
@@ -78,4 +77,6 @@ public class PlayerShooting : MonoBehaviour {
 			}
 		}
 	}
+
+
 }

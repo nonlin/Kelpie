@@ -37,6 +37,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
 		Animator anim;
 		Animator tabAnim;
 		private GameObject TabPanel;
+		GUIManager guiMan;
         ///////////////// non exposed privates /////////////////////////
         private Camera _camera;
         private bool _jump;
@@ -55,6 +56,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
 		public bool isDead = true; 
 		void Awake(){
 
+			guiMan = GameObject.Find ("NetworkManager").GetComponent<GUIManager> ();
 			NM = GetComponent<NetworkManager> ();
 			anim = GetComponentInChildren<Animator> ();
 			TabPanel = GameObject.Find ("Canvas/TabPanel");
@@ -88,12 +90,8 @@ namespace UnitySampleAssets.Characters.FirstPerson
             if (!_previouslyGrounded && _characterController.isGrounded)
             {
                 StartCoroutine(_jumpBob.DoBobCycle());
-				//Debug.Log (NM.players.Count);
-				for(int i = 0; i < NM.players.Count; i++){
-					if(NM.players[i] != null)
-						NM.players[i].go.GetComponent<PhotonView>().RPC ("PlayLandingSound",PhotonTargets.All);
-					Debug.Log (NM.players[i].go.name);
-				}
+
+				NM.player.GetComponent<PhotonView>().RPC("PlayLandingSound",PhotonTargets.All);
                 //PlayLandingSound();
                 _moveDir.y = 0f;
                 _jumping = false;
@@ -104,7 +102,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
             }
 
             _previouslyGrounded = _characterController.isGrounded;
-			TabMenu ();
+			//TabMenu ();
         }
 
 
@@ -132,10 +130,8 @@ namespace UnitySampleAssets.Characters.FirstPerson
                 if (_jump)
                 {
                     _moveDir.y = jumpSpeed;
-					for(int i = 0; i < NM.players.Count; i++){
-						if(NM.players[i] != null)
-						NM.players[i].go.GetComponent<PhotonView>().RPC ("PlayJumpSound",PhotonTargets.All); 
-					}
+	
+					NM.player.GetComponent<PhotonView>().RPC("PlayJumpSound",PhotonTargets.All);
                     //PlayJumpSound();
                     _jump = false;
                     _jumping = true;
@@ -163,10 +159,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
 
             _nextStep = _stepCycle + _stepInterval;
 
-			for(int i = 0; i < NM.players.Count; i++){
-				if(NM.players[i] != null)
-				NM.players[i].go.GetComponent<PhotonView>().RPC ("PlayFootStepAudio",PhotonTargets.All); 
-			}
+			NM.player.GetComponent<PhotonView>().RPC("PlayFootStepAudio",PhotonTargets.All);
             //PlayFootStepAudio();
         }
 
@@ -257,14 +250,20 @@ namespace UnitySampleAssets.Characters.FirstPerson
 
 		private void TabMenu(){
 
+
+		}
+
+		void OnGUI(){
+
 			if (Input.GetKey(KeyCode.Tab)) {
 				//TabPanel.SetActive (!TabPanel.activeSelf);
 				//TabPanel.SetActive(true);
-				tabAnim.SetBool ("Show",true);
+				//tabAnim.SetBool ("Show",true);
+				guiMan.ScoreBoard();
 			}
-			else
+			//else
 				//TabPanel.SetActive(false);
-				tabAnim.SetBool ("Show",false);
+				//tabAnim.SetBool ("Show",false);
 		}
     }
 }

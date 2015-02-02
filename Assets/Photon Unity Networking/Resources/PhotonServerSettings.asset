@@ -35,4 +35,7 @@ MonoBehaviour:
   - PlayJumpSound
   - PlayLandingSound
   - Score_RPC
+  - RemoveOnDeath
+  - killed
+  - Killed
   DisableAutoOpenWizard: 0

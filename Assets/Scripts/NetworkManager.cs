@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+
 
 public class NetworkManager : MonoBehaviour {
 
@@ -14,35 +15,45 @@ public class NetworkManager : MonoBehaviour {
 	[SerializeField] InputField roomName;
 	[SerializeField] InputField roomList;
 	[SerializeField] InputField messageWindow;
-	[SerializeField] Text kills;
-	[SerializeField] Text deaths;
+	[SerializeField] Text textKills;
+	[SerializeField] Text textDeaths;
 	List<int> deathCount = new List<int> ();
 	List<int> killCount = new List<int> ();
 
-	public List<Player> players = new List<Player> ();
-	GameObject player;
+	//public List<Player> players = new List<Player> ();
+	//public Player thisPlayer;
+	public GameObject player;
 	Queue<string> messages;
-	const int messageCount = 6;
+	const int messageCount = 7;
 	PhotonView photonView;
+	public bool spawning = false; 
+
+
+	ExitGames.Client.Photon.Hashtable setPlayerKills = new ExitGames.Client.Photon.Hashtable() {{"Kills", 0}};
+
+	
+	ExitGames.Client.Photon.Hashtable setPlayerDeaths = new ExitGames.Client.Photon.Hashtable() {{"Deaths", 0}};
 
 	// Use this for initialization
 	void Start () {
 	
 		photonView = GetComponent<PhotonView> ();//Initillze PhotonView
-		messages = new Queue<string> (messageCount);//Specify Size for garbage Collection
+		messages = new Queue<string> (messageCount);//Specify Size for garbage Collection 
 
 		PhotonNetwork.logLevel = PhotonLogLevel.Full;//So we see everything in output
 		//connect to Server with setup info and sets game version
 		PhotonNetwork.ConnectUsingSettings ("0.4");
 		StartCoroutine("UpdateConnectionString");
-
-		//playersGO = GameObject.FindGameObjectWithTag ("Player");
+;
+		PhotonNetwork.player.SetCustomProperties(setPlayerKills);
+		PhotonNetwork.player.SetCustomProperties(setPlayerDeaths);
 	}
 	void Update(){
 
 
 	}
 	void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info){
+
 
 	}
 
@@ -55,6 +66,7 @@ public class NetworkManager : MonoBehaviour {
 		}
 
 	}
+
 
 	void OnJoinedLobby(){
 
@@ -85,7 +97,7 @@ public class NetworkManager : MonoBehaviour {
 		connectionText.text = "";
 		StartSpawnProcess (0f);
 		AddMessage ("Player " + PhotonNetwork.player.name + " has joined.");
-
+		Screen.showCursor = false;
 
 	}
 
@@ -111,8 +123,7 @@ public class NetworkManager : MonoBehaviour {
 		player.GetComponent<PlayerNetworkMover> ().SendNetworkMessage += AddMessage;//"Subscribe" to it
 		sceneCamera.enabled = false;
 		//Add player that just spawned to player list. 
-		players.Add (new Player( player, PhotonNetwork.player.name,0,0, PhotonNetwork.player.ID)); 
-		Debug.Log ("SpawnPlayer PhotonListSize " + PhotonNetwork.playerList.Length + " SpawnPlayer playersListSize " + players.Count);
+	
 	}
 
 	void AddMessage(string message){
@@ -148,25 +159,19 @@ public class NetworkManager : MonoBehaviour {
 	[RPC]
 	void Score_RPC(string killss, string deathss){
 
-		kills.text = killss; 
-		deaths.text = deathss; 
+		textKills.text = killss; 
+		textDeaths.text = deathss; 
 	}
+
+
 
 	void OnApplicationQuit() {
 		PhotonNetwork.Disconnect ();
 	}
 
 	void OnPhotonPlayerDisconnected(PhotonPlayer playerDC){
+		//Remove DC player from list of players
 
-		for(int i = 0; i < players.Count; i++){
-
-			Debug.Log ("Server CountB " + players.Count);
-			Debug.Log ("Server List INFO " + PhotonNetwork.playerList.Length);
-			if(players[i].ID == playerDC.ID){
-				players.RemoveAt (i);
-				Debug.Log ("Server CountA " + players.Count);
-			}
-		}
 		AddMessage ("Player " + playerDC.name + " disconnected.");
 	}
 }
