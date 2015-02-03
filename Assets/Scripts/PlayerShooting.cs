@@ -16,7 +16,7 @@ public class PlayerShooting : MonoBehaviour {
 	int maxImpacts = 5;
 	bool shooting = false;
 	float damage = 25f; 
-	bool targetAlive = true;
+
 	// Use this for initialization
 	void Start () {
 		NM = GameObject.Find ("NetworkManager").GetComponent<NetworkManager> ();
@@ -51,13 +51,6 @@ public class PlayerShooting : MonoBehaviour {
 		}
 
 
-	}
-
-	[RPC]
-	public void TargetHealthCheck(float health){
-
-		if(health <= 0)
-			targetAlive = false;
 	}
 
 	void FixedUpdate(){

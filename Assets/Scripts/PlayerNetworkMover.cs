@@ -8,8 +8,6 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	public event Respawn RespawnMe;
 	public delegate void SendMessage(string message);
 	public event SendMessage SendNetworkMessage;
-	public delegate void Score(string playerName);
-	public event Score ScoreStats;
 
 	Vector3 position;
 	Quaternion rotation;
@@ -141,6 +139,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		//Take Damage and check for death
 		health -= damage;
 		if(health <=0){
+			Debug.Log ("<color=blue>Checking Health</color>" + health);
 			if (photonView.isMine) {
 				//Tell all enemies HEY Were Dead! So they can't shoot us again
 				//NM.GetComponent<PhotonView>().RPC ("TargetHealthCheck",PhotonTargets.All, health); 
@@ -161,7 +160,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 				PhotonNetwork.Destroy(gameObject);
 			}
 			else{
-				Debug.Log ("<color=blue>Checking Health and IsMine Pass</color>");
+
 				if(PhotonNetwork.player == enemy){
 
 					int totalKIlls = (int)PhotonNetwork.player.customProperties["K"];
