@@ -34,13 +34,13 @@ public class GUIManager : MonoBehaviour {
 			//GUILayout.EndVertical();
 			//Player Kills
 			GUILayout.BeginVertical(GUILayout.Width(75));
-			kills = p.customProperties["Kills"].ToString();
-			GUILayout.Label (kills, GUILayout.Width (75));
+			//kills = p.customProperties["K"].ToString();
+			GUILayout.Label (p.customProperties["K"].ToString(), GUILayout.Width (75));
 			GUILayout.EndVertical();
 			//Player Deaths
 			GUILayout.BeginVertical(GUILayout.Width(75));
-			deaths = p.customProperties["Deaths"].ToString();
-			GUILayout.Label (deaths, GUILayout.Width (75));
+			//deaths = p.customProperties["D"].ToString();
+			GUILayout.Label (p.customProperties["D"].ToString(), GUILayout.Width (75));
 			GUILayout.EndVertical();
 
 			GUILayout.EndHorizontal();
@@ -48,4 +48,12 @@ public class GUIManager : MonoBehaviour {
 		}
 		GUILayout.EndArea();
 	}
+
+	/*void OnPhotonPlayerPropertiesChanged(object[] playerAndUpdatedProps) {
+
+		foreach (PhotonPlayer p in PhotonNetwork.playerList) {
+			kills = p.customProperties["K"].ToString();
+			deaths = p.customProperties["D"].ToString();
+		}
+	}*/
 }

@@ -46929,8 +46929,6 @@ MonoBehaviour:
   textDeaths: {fileID: 0}
   player: {fileID: 0}
   spawning: 0
-  kills: 0
-  deaths: 0
 --- !u!114 &2005560879
 MonoBehaviour:
   m_ObjectHideFlags: 0

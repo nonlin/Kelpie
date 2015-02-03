@@ -38,4 +38,6 @@ MonoBehaviour:
   - RemoveOnDeath
   - killed
   - Killed
+  - TargetHealthCheck
+  - GetHealth
   DisableAutoOpenWizard: 0

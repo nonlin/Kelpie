@@ -16,7 +16,7 @@ public class PlayerShooting : MonoBehaviour {
 	int maxImpacts = 5;
 	bool shooting = false;
 	float damage = 25f; 
-
+	bool targetAlive = true;
 	// Use this for initialization
 	void Start () {
 		NM = GameObject.Find ("NetworkManager").GetComponent<NetworkManager> ();
@@ -53,6 +53,13 @@ public class PlayerShooting : MonoBehaviour {
 
 	}
 
+	[RPC]
+	public void TargetHealthCheck(float health){
+
+		if(health <= 0)
+			targetAlive = false;
+	}
+
 	void FixedUpdate(){
 
 		if (shooting) {
@@ -63,8 +70,13 @@ public class PlayerShooting : MonoBehaviour {
 			if(Physics.Raycast(transform.position, transform.forward, out hit, 50f)){
 
 				if(hit.transform.tag == "Player"){
-					//Tell all we shot a player and call the RPC function GetShot passing damage runs on person shooting
-					hit.transform.GetComponent<PhotonView>().RPC ("GetShot", PhotonTargets.All, damage, PhotonNetwork.player); 
+
+					if(hit.transform.GetComponent<PlayerNetworkMover>().GetHealth() > 0){
+
+						//Tell all we shot a player and call the RPC function GetShot passing damage runs on person shooting
+						hit.transform.GetComponent<PhotonView>().RPC ("GetShot", PhotonTargets.All, damage, PhotonNetwork.player); 
+						Debug.Log ("<color=red>Target Health</color> " + hit.transform.GetComponent<PlayerNetworkMover>().GetHealth());
+					}
 				}
 
 				impacts[currentImpact].transform.position = hit.point;

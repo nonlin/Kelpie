@@ -17,11 +17,7 @@ public class NetworkManager : MonoBehaviour {
 	[SerializeField] InputField messageWindow;
 	[SerializeField] Text textKills;
 	[SerializeField] Text textDeaths;
-	List<int> deathCount = new List<int> ();
-	List<int> killCount = new List<int> ();
 
-	//public List<Player> players = new List<Player> ();
-	//public Player thisPlayer;
 	public GameObject player;
 	Queue<string> messages;
 	const int messageCount = 7;
@@ -29,11 +25,9 @@ public class NetworkManager : MonoBehaviour {
 	public bool spawning = false; 
 
 
-	ExitGames.Client.Photon.Hashtable setPlayerKills = new ExitGames.Client.Photon.Hashtable() {{"Kills", 0}};
-
-	
-	ExitGames.Client.Photon.Hashtable setPlayerDeaths = new ExitGames.Client.Photon.Hashtable() {{"Deaths", 0}};
-
+	ExitGames.Client.Photon.Hashtable setPlayerKills = new ExitGames.Client.Photon.Hashtable() {{"K", 0}};
+	ExitGames.Client.Photon.Hashtable setPlayerDeaths = new ExitGames.Client.Photon.Hashtable() {{"D", 0}};
+	//ExitGames.Client.Photon.Hashtable setPlayerHealth= new ExitGames.Client.Photon.Hashtable() {{"H", 100}};
 	// Use this for initialization
 	void Start () {
 	
@@ -44,9 +38,9 @@ public class NetworkManager : MonoBehaviour {
 		//connect to Server with setup info and sets game version
 		PhotonNetwork.ConnectUsingSettings ("0.4");
 		StartCoroutine("UpdateConnectionString");
-;
 		PhotonNetwork.player.SetCustomProperties(setPlayerKills);
 		PhotonNetwork.player.SetCustomProperties(setPlayerDeaths);
+		//PhotonNetwork.player.SetCustomProperties(setPlayerHealth);
 	}
 	void Update(){
 
