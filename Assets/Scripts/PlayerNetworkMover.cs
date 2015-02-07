@@ -34,15 +34,17 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	AudioSource audio1;
 	AudioSource[] aSources;
 	Animator anim;
-	NetworkManager NM;
-
+	ColliderControl colidcon;
+	bool alive = true;
 
 	//AudioSource audio;
 	// Use this for initialization
 	void Start () {
-		//cc = GetComponent<CharacterController>();
-		NM = GameObject.Find ("NetworkManager").GetComponent<NetworkManager> ();
 
+		colidcon = gameObject.GetComponent<ColliderControl> ();
+		PhotonNetwork.isMessageQueueRunning = true;
+		//Disables my Character Controller interstingly enough. That way I can only enable it for the clien'ts player.  
+		transform.GetComponent<Collider>().enabled = false;
 		//Use this to get current player this script is attached too
 		aSources = GetComponents<AudioSource> (); 
 		audio0 = aSources [0];
@@ -53,6 +55,9 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		//If its my player, not anothers
 		if (photonView.isMine) {
 
+			//Enable CC so we can control character. 
+			transform.GetComponent<Collider>().enabled = true;
+			//Use for Sound toggle
 			_characterController = GetComponent<CharacterController>();
 			//gameObject.name = PhotonNetwork.player.name;
 			playerName = PhotonNetwork.player.name;
@@ -137,12 +142,13 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	[RPC]
 	public void GetShot(float damage, PhotonPlayer enemy){
 		//Take Damage and check for death
+		 
 		health -= damage;
-		if(health <=0){
+		if(health <=0 && alive){
+
+			alive = false; 
 			Debug.Log ("<color=blue>Checking Health</color>" + health);
 			if (photonView.isMine) {
-				//Tell all enemies HEY Were Dead! So they can't shoot us again
-				//NM.GetComponent<PhotonView>().RPC ("TargetHealthCheck",PhotonTargets.All, health); 
 
 				if(SendNetworkMessage != null){
 					SendNetworkMessage(PhotonNetwork.player.name + " got owned by " + enemy.name);
@@ -157,18 +163,22 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 				ExitGames.Client.Photon.Hashtable setPlayerDeaths = new ExitGames.Client.Photon.Hashtable() {{"D", totalDeaths}};
 				PhotonNetwork.player.SetCustomProperties(setPlayerDeaths);
 				//Destroy Object on network
+				Debug.Log ("<color=green> Collider State After</color>"+transform.GetComponent<Collider>().enabled.ToString());
 				PhotonNetwork.Destroy(gameObject);
+
 			}
 			else{
 
-				if(PhotonNetwork.player == enemy){
+				foreach(PhotonPlayer p in PhotonNetwork.playerList)
+					if(PhotonNetwork.player == enemy){
 
-					int totalKIlls = (int)PhotonNetwork.player.customProperties["K"];
-					totalKIlls ++;
-					ExitGames.Client.Photon.Hashtable setPlayerKills = new ExitGames.Client.Photon.Hashtable() {{"K", totalKIlls}};
-					Debug.Log ("<color=red>KillCounter Called at </color>" + totalKIlls);
-					PhotonNetwork.player.SetCustomProperties(setPlayerKills);
-				}
+						int totalKIlls = (int)PhotonNetwork.player.customProperties["K"];
+						totalKIlls ++;
+						ExitGames.Client.Photon.Hashtable setPlayerKills = new ExitGames.Client.Photon.Hashtable() {{"K", totalKIlls}};
+						Debug.Log ("<color=red>KillCounter Called at </color>" + totalKIlls);
+						PhotonNetwork.player.SetCustomProperties(setPlayerKills);
+						break; 
+					}
 			}
 		}
 	}
@@ -200,20 +210,6 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		audio.Play();
 	}
 	
-	[RPC]
-	public void PlayFootStepAudio()
-	{
-		//if (!_characterController.isGrounded) return;
-		// pick & play a random footstep sound from the array,
-		// excluding sound at index 0
-		int n = Random.Range(1, _footstepSounds.Length);
-		audio.clip = _footstepSounds[n];
-		audio.PlayOneShot(audio.clip);
-		// move picked sound to index 0 so it's not picked next time
-		_footstepSounds[n] = _footstepSounds[0];
-		_footstepSounds[0] = audio.clip;
-	}
-
 
 	// Update is called once per frame
 	void Update () {

@@ -6,11 +6,11 @@ public class PlayerShooting : MonoBehaviour {
 	public ParticleSystem muzzleFlash;
 	Animator anim;
 	public GameObject impactPrefab;
+	private float timeStamp ;
 	//public GameObject bulletHole;
 
 	GameObject[] impacts;
 	GameObject[] impactHole;
-	GameObject[] players;
 	NetworkManager NM;
 	int currentImpact = 0;
 	int maxImpacts = 5;
@@ -27,22 +27,20 @@ public class PlayerShooting : MonoBehaviour {
 		}
 
 		anim = GetComponentInChildren<Animator> ();
-		//
-		players = GameObject.FindGameObjectsWithTag("Player");
-
+		timeStamp = 0; 
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-		if (Input.GetButtonDown ("Fire1") && !Input.GetKey (KeyCode.LeftShift)) {
+		if (Input.GetButton ("Fire1") && !Input.GetKey (KeyCode.LeftShift) && timeStamp <= Time.time) {
 				
 			muzzleFlash.Emit(1);
 			//anim.Play("Fire");
 			//anim.SetTrigger("Fire");
 			anim.SetBool("Fire",true);
 			shooting = true; 
-
+			timeStamp = Time.time + 0.1f;
 			NM.player.GetComponent<PhotonView>().RPC ("ShootingSound",PhotonTargets.All,true);
 		}
 		else{

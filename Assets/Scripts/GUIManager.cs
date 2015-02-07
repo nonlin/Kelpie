@@ -17,9 +17,10 @@ public class GUIManager : MonoBehaviour {
 
 	public void ScoreBoard(){
 
-		GUI.Label (new Rect (Screen.height - (Screen.height / 2) + 150, Screen.width - (Screen.width / 2) - 20, 150, 150), "Kills");
-		GUI.Label (new Rect (Screen.height - (Screen.height / 2) + 225, Screen.width - (Screen.width / 2) - 20, 150, 150), "Deaths");
-		GUILayout.BeginArea(new Rect(Screen.height - (Screen.height/2), Screen.width - (Screen.width/2), 400,500));
+		GUI.Label (new Rect ((Screen.height / 2) + 150,(Screen.width / 2) - 20, 50, 50), "Kills");
+		GUI.Label (new Rect ((Screen.height / 2) + 225,(Screen.width / 2) - 20, 50, 50), "Deaths");
+		GUI.Label (new Rect ((Screen.height / 2) + 300,(Screen.width / 2) - 20, 50, 50), "Ping");
+		GUILayout.BeginArea(new Rect((Screen.height/2),(Screen.width/2), 400,500));
 
 		foreach (PhotonPlayer p in PhotonNetwork.playerList) {
 		
@@ -41,6 +42,11 @@ public class GUIManager : MonoBehaviour {
 			GUILayout.BeginVertical(GUILayout.Width(75));
 			//deaths = p.customProperties["D"].ToString();
 			GUILayout.Label (p.customProperties["D"].ToString(), GUILayout.Width (75));
+			GUILayout.EndVertical();
+			//Player Ping
+			GUILayout.BeginVertical(GUILayout.Width(75));
+			//deaths = p.customProperties["D"].ToString();
+			GUILayout.Label (PhotonNetwork.GetPing().ToString(), GUILayout.Width (75));
 			GUILayout.EndVertical();
 
 			GUILayout.EndHorizontal();
