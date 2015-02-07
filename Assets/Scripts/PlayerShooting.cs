@@ -62,13 +62,11 @@ public class PlayerShooting : MonoBehaviour {
 
 				if(hit.transform.tag == "Player"){
 
-					if(hit.transform.GetComponent<PlayerNetworkMover>().GetHealth() > 0){
-
-						//Tell all we shot a player and call the RPC function GetShot passing damage runs on person shooting
-						hit.transform.GetComponent<PhotonView>().RPC ("GetShot", PhotonTargets.All, damage, PhotonNetwork.player); 
-						Debug.Log ("<color=red>Target Health</color> " + hit.transform.GetComponent<PlayerNetworkMover>().GetHealth());
-					}
+					//Tell all we shot a player and call the RPC function GetShot passing damage runs on person shooting
+					hit.transform.GetComponent<PhotonView>().RPC ("GetShot", PhotonTargets.All, damage, PhotonNetwork.player); 
+					Debug.Log ("<color=red>Target Health</color> " + hit.transform.GetComponent<PlayerNetworkMover>().GetHealth());
 				}
+				else
 
 				impacts[currentImpact].transform.position = hit.point;
 				impacts[currentImpact].GetComponent<ParticleSystem>().Emit(1);

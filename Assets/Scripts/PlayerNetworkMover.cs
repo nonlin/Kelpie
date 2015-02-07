@@ -169,16 +169,15 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			}
 			else{
 
-				foreach(PhotonPlayer p in PhotonNetwork.playerList)
-					if(PhotonNetwork.player == enemy){
+				if(PhotonNetwork.player == enemy){
 
-						int totalKIlls = (int)PhotonNetwork.player.customProperties["K"];
-						totalKIlls ++;
-						ExitGames.Client.Photon.Hashtable setPlayerKills = new ExitGames.Client.Photon.Hashtable() {{"K", totalKIlls}};
-						Debug.Log ("<color=red>KillCounter Called at </color>" + totalKIlls);
-						PhotonNetwork.player.SetCustomProperties(setPlayerKills);
-						break; 
-					}
+					int totalKIlls = (int)PhotonNetwork.player.customProperties["K"];
+					totalKIlls ++;
+					ExitGames.Client.Photon.Hashtable setPlayerKills = new ExitGames.Client.Photon.Hashtable() {{"K", totalKIlls}};
+					Debug.Log ("<color=red>KillCounter Called at </color>" + totalKIlls);
+					PhotonNetwork.player.SetCustomProperties(setPlayerKills);
+
+				}
 			}
 		}
 	}
