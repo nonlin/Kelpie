@@ -38933,6 +38933,7 @@ GameObject:
   - 224: {fileID: 1688075611}
   - 222: {fileID: 1688075613}
   - 114: {fileID: 1688075612}
+  - 95: {fileID: 1688075614}
   m_Layer: 0
   m_Name: PauseScreen
   m_TagString: Untagged
@@ -38985,6 +38986,21 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1688075610}
+--- !u!95 &1688075614
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1688075610}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 795a249eca9bc5143a36ee6136538b71, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!1 &1688268527
 GameObject:
   m_ObjectHideFlags: 0
