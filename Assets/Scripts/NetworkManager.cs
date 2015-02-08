@@ -11,19 +11,24 @@ public class NetworkManager : MonoBehaviour {
 	[SerializeField] Camera sceneCamera;
 
 	[SerializeField] GameObject lobbyWindow;
+	[SerializeField] GameObject mainMenu;
+	[SerializeField] GameObject ammoText;
+	[SerializeField] GameObject versionText;
+
 	[SerializeField] InputField userName;
 	[SerializeField] InputField roomName;
 	[SerializeField] InputField roomList;
 	[SerializeField] InputField messageWindow;
-	[SerializeField] Text textKills;
-	[SerializeField] Text textDeaths;
-
+	//[SerializeField] Text textKills;
+	//[SerializeField] Text textDeaths;
+	[SerializeField] Canvas pauseCanvas;
+	[SerializeField] Canvas mainCanvas;
 	public GameObject player;
 	Queue<string> messages;
 	const int messageCount = 7;
 	PhotonView photonView;
 	public bool spawning = false; 
-
+	bool paused = false;
 
 	ExitGames.Client.Photon.Hashtable setPlayerKills = new ExitGames.Client.Photon.Hashtable() {{"K", 0}};
 	ExitGames.Client.Photon.Hashtable setPlayerDeaths = new ExitGames.Client.Photon.Hashtable() {{"D", 0}};
@@ -43,13 +48,42 @@ public class NetworkManager : MonoBehaviour {
 		PhotonNetwork.player.SetCustomProperties(setPlayerDeaths);
 		//PhotonNetwork.player.SetCustomProperties(setPlayerHealth);
 		//Game Managing Stuff
-
+		ammoText.SetActive (false);
+		pauseCanvas.enabled = false;
+		versionText.SetActive (true);
 	}
 	void Update(){
 
-		if (Input.GetKey (KeyCode.Escape)) {
+		if(GameObject.FindGameObjectWithTag ("Player") != null && photonView.isMine){
 
-			Screen.lockCursor = false;
+			if (Input.GetKeyDown (KeyCode.Escape)) {
+
+				Debug.Log ("Esc hit");
+					if(!paused){
+
+					//Time.timeScale = 0;
+					Screen.lockCursor = false;
+					Screen.showCursor = true;
+					GameObject.FindGameObjectWithTag ("Player").GetComponent<CharacterController>().enabled = false;
+					GameObject.FindGameObjectWithTag ("Player").GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().enabled = false;
+					pauseCanvas.enabled = true;
+					mainCanvas.enabled = false;
+					paused = !paused;
+				}
+				else{
+
+					//Time.timeScale = 1;
+					Screen.lockCursor = true;
+					Screen.showCursor = false;
+					GameObject.FindGameObjectWithTag ("Player").GetComponent<CharacterController>().enabled = true;
+					GameObject.FindGameObjectWithTag ("Player").GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().enabled = true;
+					pauseCanvas.enabled = false;
+					mainCanvas.enabled = true;
+					paused = !paused;
+				}
+			}
+
+
 		}
 
 	}
@@ -72,6 +106,7 @@ public class NetworkManager : MonoBehaviour {
 	void OnJoinedLobby(){
 
 		lobbyWindow.SetActive (true);
+
 	}
 
 	void OnReceivedRoomListUpdate(){
@@ -93,7 +128,12 @@ public class NetworkManager : MonoBehaviour {
 
 	void OnJoinedRoom(){
 
+		//Toggle On/Off Lobby GUI and InGame GUI
 		lobbyWindow.SetActive (false);
+		mainMenu.SetActive (false);
+		ammoText.SetActive (true);
+		versionText.SetActive (false);
+		//
 		StopCoroutine ("UpdateConnectionString");
 		connectionText.text = "";
 		StartSpawnProcess (0f);
@@ -157,15 +197,6 @@ public class NetworkManager : MonoBehaviour {
 			}
 		}
 	}*/
-
-	[RPC]
-	void Score_RPC(string killss, string deathss){
-
-		textKills.text = killss; 
-		textDeaths.text = deathss; 
-	}
-
-
 
 	void OnApplicationQuit() {
 		PhotonNetwork.Disconnect ();

@@ -16,6 +16,8 @@ TagManager:
   - NetworkManager
   - Body
   - Ammo
+  - WeaponCam
+  - OptionsPanel
   - 
   Builtin Layer 0: Default
   Builtin Layer 1: TransparentFX

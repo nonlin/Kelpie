@@ -248,10 +248,6 @@ namespace UnitySampleAssets.Characters.FirstPerson
 
         }
 
-		private void TabMenu(){
-
-
-		}
 
 		void OnGUI(){
 
@@ -261,10 +257,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
 				//tabAnim.SetBool ("Show",true);
 				guiMan.ScoreBoard();
 			}
-			//else
-				//TabPanel.SetActive(false);
-				//tabAnim.SetBool ("Show",false);
-		}
 
+		}
     }
 }
