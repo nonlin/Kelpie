@@ -60,7 +60,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
 			NM = GetComponent<NetworkManager> ();
 			anim = GetComponentInChildren<Animator> ();
 			TabPanel = GameObject.Find ("Canvas/TabPanel");
-			tabAnim = TabPanel.GetComponent<Animator> ();
+
 		}
         // Use this for initialization
         private void Start()
@@ -266,18 +266,5 @@ namespace UnitySampleAssets.Characters.FirstPerson
 				//tabAnim.SetBool ("Show",false);
 		}
 
-		[RPC]
-		public void PlayFootStepAudio()
-		{
-			if (!_characterController.isGrounded) return;
-			// pick & play a random footstep sound from the array,
-			// excluding sound at index 0
-			int n = Random.Range(1, _footstepSounds.Length);
-			audio.clip = _footstepSounds[n];
-			audio.PlayOneShot(audio.clip);
-			// move picked sound to index 0 so it's not picked next time
-			_footstepSounds[n] = _footstepSounds[0];
-			_footstepSounds[0] = audio.clip;
-		}
     }
 }

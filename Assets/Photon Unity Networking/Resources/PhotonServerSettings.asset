@@ -40,4 +40,6 @@ MonoBehaviour:
   - Killed
   - TargetHealthCheck
   - GetHealth
+  - ReloadingSound
+  - OutOfAmmo
   DisableAutoOpenWizard: 0

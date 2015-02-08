@@ -23,6 +23,8 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	bool initialLoad = true;
 	bool isShooting = false; 
 	public AudioClip AKFire;
+	public AudioClip AKReload;
+	public AudioClip AKEmpty;
 	[SerializeField] private AudioClip _jumpSound; // the sound played when character leaves the ground.
 	[SerializeField] private AudioClip _landSound; // the sound played when character touches back on ground.
 	[SerializeField] private AudioClip[] _footstepSounds;
@@ -165,7 +167,8 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 				//Destroy Object on network
 				Debug.Log ("<color=green> Collider State After</color>"+transform.GetComponent<Collider>().enabled.ToString());
 				PhotonNetwork.Destroy(gameObject);
-
+				foreach(PhotonPlayer p in PhotonNetwork.playerList)
+				Debug.Log ("<color=red>PlayerLIst</color>" + p.name);
 			}
 			else{
 
@@ -194,6 +197,29 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	}
 
 	[RPC]
+	public void ReloadingSound(){
+		
+		//if (firing) {
+			
+			//isShooting = true; 
+			audio1.clip = AKReload;
+			audio1.Play();
+		//}
+	}
+
+	[RPC]
+	public void OutOfAmmo(){
+		
+		//if (firing) {
+		
+		//isShooting = true; 
+		audio1.clip = AKEmpty;
+		audio1.Play();
+		//}
+	}
+
+
+	[RPC]
 	public void PlayLandingSound()
 	{
 		audio.clip = _landSound;
@@ -208,7 +234,21 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		audio.clip = _jumpSound;
 		audio.Play();
 	}
+
 	
+	[RPC]
+	public void PlayFootStepAudio()
+	{
+		//if (!_characterController.isGrounded) return;
+		// pick & play a random footstep sound from the array,
+		// excluding sound at index 0
+		int n = Random.Range(1, _footstepSounds.Length);
+		audio.clip = _footstepSounds[n];
+		audio.PlayOneShot(audio.clip);
+		// move picked sound to index 0 so it's not picked next time
+		_footstepSounds[n] = _footstepSounds[0];
+		_footstepSounds[0] = audio.clip;
+	}
 
 	// Update is called once per frame
 	void Update () {

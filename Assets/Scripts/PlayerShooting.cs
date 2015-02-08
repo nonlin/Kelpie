@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class PlayerShooting : MonoBehaviour {
 
@@ -16,28 +17,40 @@ public class PlayerShooting : MonoBehaviour {
 	int maxImpacts = 5;
 	bool shooting = false;
 	float damage = 25f; 
+	int clipSize = 30;
+	bool reloading = false; 
+	public Text ammoText;
+
 
 	// Use this for initialization
 	void Start () {
+
+
 		NM = GameObject.Find ("NetworkManager").GetComponent<NetworkManager> ();
 		impacts = new GameObject[maxImpacts];
+		ammoText = GameObject.FindGameObjectWithTag ("Ammo").GetComponent<Text>();
 		for (int i = 0; i < maxImpacts; i++){
 			impacts [i] = (GameObject)Instantiate (impactPrefab);
 			//impactHole[i] = (GameObject)Instantiate(bulletHole);
 		}
+		
+		for(int i = 0; i < maxImpacts; i++)
+			impacts[i].transform.parent = gameObject.transform;
 
 		anim = GetComponentInChildren<Animator> ();
 		timeStamp = 0; 
+
+		ammoText.text = clipSize.ToString();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-		if (Input.GetButton ("Fire1") && !Input.GetKey (KeyCode.LeftShift) && timeStamp <= Time.time) {
+		if (Input.GetButton ("Fire1") && !Input.GetKey (KeyCode.LeftShift) && timeStamp <= Time.time && clipSize >= 0) {
 				
 			muzzleFlash.Emit(1);
-			//anim.Play("Fire");
-			//anim.SetTrigger("Fire");
+			clipSize--;
+			ammoText.text = clipSize.ToString();
 			anim.SetBool("Fire",true);
 			shooting = true; 
 			timeStamp = Time.time + 0.1f;
@@ -45,12 +58,35 @@ public class PlayerShooting : MonoBehaviour {
 		}
 		else{
 			anim.SetBool("Fire",false);
-
 		}
 
+		if (Input.GetKeyDown (KeyCode.R) && !Input.GetButton ("Fire1") && clipSize < 30 && !reloading) {
+
+			Debug.Log("Reloading");
+			reloading = true; 
+			NM.player.GetComponent<PhotonView>().RPC ("ReloadingSound",PhotonTargets.All);
+			StartCoroutine(Reload());
+		}
+		if (clipSize <= 0 && Input.GetButtonDown ("Fire1")) {
+			//StartCoroutine(EmptyGun());
+			NM.player.GetComponent<PhotonView>().RPC ("OutOfAmmo",PhotonTargets.All);
+		}
 
 	}
 
+	IEnumerator Reload(){
+
+		yield return new WaitForSeconds(2.0f);
+		clipSize = 30;
+		ammoText.text = clipSize.ToString();
+		reloading = false; 
+	}
+
+	IEnumerator EmptyGun(){
+
+		yield return new WaitForSeconds(1.0f);
+		NM.player.GetComponent<PhotonView>().RPC ("OutOfAmmo",PhotonTargets.All);
+	}
 	void FixedUpdate(){
 
 		if (shooting) {
@@ -66,7 +102,6 @@ public class PlayerShooting : MonoBehaviour {
 					hit.transform.GetComponent<PhotonView>().RPC ("GetShot", PhotonTargets.All, damage, PhotonNetwork.player); 
 					Debug.Log ("<color=red>Target Health</color> " + hit.transform.GetComponent<PlayerNetworkMover>().GetHealth());
 				}
-				else
 
 				impacts[currentImpact].transform.position = hit.point;
 				impacts[currentImpact].GetComponent<ParticleSystem>().Emit(1);
@@ -74,6 +109,9 @@ public class PlayerShooting : MonoBehaviour {
 				//impacts[currentImpact].GetComponent<ParticleSystem>().Emit(1);
 				if(++currentImpact >= maxImpacts){
 					currentImpact = 0; 
+				}
+				if(currentImpact >= maxImpacts){
+
 				}
 			}
 		}

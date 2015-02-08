@@ -42,9 +42,15 @@ public class NetworkManager : MonoBehaviour {
 		PhotonNetwork.player.SetCustomProperties(setPlayerKills);
 		PhotonNetwork.player.SetCustomProperties(setPlayerDeaths);
 		//PhotonNetwork.player.SetCustomProperties(setPlayerHealth);
+		//Game Managing Stuff
+
 	}
 	void Update(){
 
+		if (Input.GetKey (KeyCode.Escape)) {
+
+			Screen.lockCursor = false;
+		}
 
 	}
 	void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info){
@@ -93,6 +99,7 @@ public class NetworkManager : MonoBehaviour {
 		StartSpawnProcess (0f);
 		AddMessage ("Player " + PhotonNetwork.player.name + " has joined.");
 		Screen.showCursor = false;
+		Screen.lockCursor = true;
 
 	}
 
@@ -164,6 +171,10 @@ public class NetworkManager : MonoBehaviour {
 		PhotonNetwork.Disconnect ();
 	}
 
+	public void QuitGame(){
+
+		Application.Quit();
+	}
 	void OnPhotonPlayerDisconnected(PhotonPlayer playerDC){
 		//Remove DC player from list of players
 

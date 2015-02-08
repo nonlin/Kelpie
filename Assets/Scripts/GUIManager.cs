@@ -55,6 +55,10 @@ public class GUIManager : MonoBehaviour {
 		GUILayout.EndArea();
 	}
 
+	public void UserInterface(){
+
+
+	}
 	/*void OnPhotonPlayerPropertiesChanged(object[] playerAndUpdatedProps) {
 
 		foreach (PhotonPlayer p in PhotonNetwork.playerList) {
