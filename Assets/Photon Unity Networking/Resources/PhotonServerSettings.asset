@@ -42,4 +42,9 @@ MonoBehaviour:
   - GetHealth
   - ReloadingSound
   - OutOfAmmo
+  - ColorRpc
+  - DoJump
+  - Marco
+  - Polo
+  - TaggedPlayer
   DisableAutoOpenWizard: 0

@@ -2,6 +2,7 @@
 using UnitySampleAssets.CrossPlatformInput;
 using UnitySampleAssets.Utility;
 using UnityEngine.UI;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace UnitySampleAssets.Characters.FirstPerson
@@ -36,7 +37,6 @@ namespace UnitySampleAssets.Characters.FirstPerson
 		NetworkManager NM;
 		Animator anim;
 		Animator tabAnim;
-		private GameObject TabPanel;
 		GUIManager guiMan;
         ///////////////// non exposed privates /////////////////////////
         private Camera _camera;
@@ -52,14 +52,13 @@ namespace UnitySampleAssets.Characters.FirstPerson
         private float _stepCycle = 0f;
         private float _nextStep = 0f;
         private bool _jumping = false;
+		private float stamina = 100f;
 
-		public bool isDead = true; 
 		void Awake(){
 
 			guiMan = GameObject.Find ("NetworkManager").GetComponent<GUIManager> ();
 			NM = GetComponent<NetworkManager> ();
 			anim = GetComponentInChildren<Animator> ();
-			TabPanel = GameObject.Find ("Canvas/TabPanel");
 
 		}
         // Use this for initialization
@@ -75,6 +74,8 @@ namespace UnitySampleAssets.Characters.FirstPerson
             _nextStep = _stepCycle/2f;
             _jumping = false;
 			NM = GameObject.Find("NetworkManager").GetComponent<NetworkManager>(); 
+			_mouseLook.XSensitivity = PlayerPrefs.GetFloat ("xAxis");
+			_mouseLook.YSensitivity = PlayerPrefs.GetFloat ("yAxis");
 			//players = GameObject.FindGameObjectsWithTag("Player");
         }
 
@@ -198,7 +199,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
 #if !MOBILE_INPUT
             // On standalone builds, walk/run speed is modified by a key press.
             // keep track of whether or not the character is walking or running
-            _isWalking = !Input.GetKey(KeyCode.LeftShift);
+            _isWalking = !Input.GetKey(KeyCode.LeftShift) || stamina <= 0;
 			bool aim = Input.GetButton("Fire2");
 			
 			if(aim){
@@ -206,6 +207,13 @@ namespace UnitySampleAssets.Characters.FirstPerson
 			}
 			anim.SetBool("Sprint", !_isWalking);
 			anim.SetBool ("Aim", aim);
+			//Drain Stamina
+			if(!_isWalking && _characterController.velocity.x > 1){
+				stamina = stamina-0.9f;
+				Debug.Log(stamina);
+			}
+			//Stamina Regen
+			StartCoroutine(StaminaRegen());
 #endif
             // set the desired speed to be walking or running
             speed = _isWalking ? walkSpeed : runSpeed;
@@ -257,7 +265,15 @@ namespace UnitySampleAssets.Characters.FirstPerson
 				//tabAnim.SetBool ("Show",true);
 				guiMan.ScoreBoard();
 			}
+		}
 
+		IEnumerator StaminaRegen(){
+
+			yield return new WaitForSeconds(3.0f); 
+
+			if(_isWalking && stamina <= 100){
+				stamina = stamina + 0.5f;
+			}
 		}
     }
 }

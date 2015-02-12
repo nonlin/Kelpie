@@ -14,14 +14,13 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	float smoothing = 10f;
 	float health = 100f;
 	public string playerName; 
-	public int kills = 0;
-	public int deaths = 0; 
+
 	GameObject[] weapons;
 
 	bool aim = false;
 	bool sprint = false;
 	bool initialLoad = true;
-	bool isShooting = false; 
+
 	public AudioClip AKFire;
 	public AudioClip AKReload;
 	public AudioClip AKEmpty;
@@ -36,27 +35,26 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	AudioSource audio1;
 	AudioSource[] aSources;
 	Animator anim;
-	ColliderControl colidcon;
-	bool alive = true;
+	//ColliderControl colidcon;
+	[SerializeField] bool alive;
 
 	//AudioSource audio;
 	// Use this for initialization
 	void Start () {
 
-		colidcon = gameObject.GetComponent<ColliderControl> ();
-		PhotonNetwork.isMessageQueueRunning = true;
+		alive = true; 
 		//Disables my Character Controller interstingly enough. That way I can only enable it for the clien'ts player.  
 		transform.GetComponent<Collider>().enabled = false;
 		//Use this to get current player this script is attached too
 		aSources = GetComponents<AudioSource> (); 
 		audio0 = aSources [0];
 		audio1 = aSources [1];
-		//cc.enabled = false;
 		anim = GetComponentInChildren<Animator> ();
 		//audio = GetComponentInChildren<AudioSource> ();
 		//If its my player, not anothers
 		if (photonView.isMine) {
 
+			Debug.Log ("<color=red>Joined Room </color>" + PhotonNetwork.player.name + " " + photonView.isMine);
 			//Enable CC so we can control character. 
 			transform.GetComponent<Collider>().enabled = true;
 			//Use for Sound toggle
@@ -117,6 +115,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			//Sync Animation States
 			stream.SendNext(anim.GetBool ("Aim"));
 			stream.SendNext(anim.GetBool ("Sprint"));
+			stream.SendNext(alive);
 
 			//stream.SendNext(deaths);
 
@@ -131,6 +130,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			//Sync Animation States
 			aim = (bool)stream.ReceiveNext();
 			sprint = (bool)stream.ReceiveNext();
+			alive = (bool)stream.ReceiveNext();
 			
 		}
 																												
@@ -144,14 +144,15 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	[RPC]
 	public void GetShot(float damage, PhotonPlayer enemy){
 		//Take Damage and check for death
-		 
+		
 		health -= damage;
+		Debug.Log ("Got Shot with " + damage + " damage. Is alive: " + alive);
 		if(health <=0 && alive){
-
+			
 			alive = false; 
-			Debug.Log ("<color=blue>Checking Health</color>" + health);
+			Debug.Log ("<color=blue>Checking Health</color>" + health + " Photon State " + photonView.isMine + " Player Name " + PhotonNetwork.player.name);
 			if (photonView.isMine) {
-
+				Debug.Log ("<color=red>Death</color>");
 				if(SendNetworkMessage != null){
 					SendNetworkMessage(PhotonNetwork.player.name + " got owned by " + enemy.name);
 				}
@@ -168,33 +169,33 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 				Debug.Log ("<color=green> Collider State After</color>"+transform.GetComponent<Collider>().enabled.ToString());
 				PhotonNetwork.Destroy(gameObject);
 				foreach(PhotonPlayer p in PhotonNetwork.playerList)
-				Debug.Log ("<color=red>PlayerLIst</color>" + p.name);
+					Debug.Log ("<color=red>PlayerLIst</color>" + p.name);
 			}
 			else{
-
+				
 				if(PhotonNetwork.player == enemy){
-
+					
 					int totalKIlls = (int)PhotonNetwork.player.customProperties["K"];
 					totalKIlls ++;
 					ExitGames.Client.Photon.Hashtable setPlayerKills = new ExitGames.Client.Photon.Hashtable() {{"K", totalKIlls}};
 					Debug.Log ("<color=red>KillCounter Called at </color>" + totalKIlls);
 					PhotonNetwork.player.SetCustomProperties(setPlayerKills);
-
+					
 				}
 			}
 		}
 	}
 
+
 	[RPC]
 	public void ShootingSound(bool firing){
-
-		if (firing) {
 		
-			isShooting = true; 
-			audio1.clip = AKFire;
-			audio1.Play();
+		if (firing) {
+			
+				audio1.clip = AKFire;
+				audio1.Play();
+			}
 		}
-	}
 
 	[RPC]
 	public void ReloadingSound(){
@@ -253,5 +254,11 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	
+		if(Input.GetKeyDown(KeyCode.K)){
+
+			//health = 0;
+			gameObject.GetComponent<PhotonView>().RPC ("GetShot", PhotonTargets.All, 25f, PhotonNetwork.player);
+			Debug.Log (health);
+		}
 	}
 }

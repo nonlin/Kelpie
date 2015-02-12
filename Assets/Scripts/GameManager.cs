@@ -7,11 +7,13 @@ public class GameManager : MonoBehaviour {
 	Animator optionsAnim;
 	public Text xAxis_Text;
 	public Text yAxis_Text;
-
+	float xAx;
+	float yAx;
 	// Use this for initialization
 	void Start () {
-	
-		Screen.lockCursor = false;
+
+		yAxis_Text.text = PlayerPrefs.GetFloat("yAxis").ToString();
+		xAxis_Text.text = PlayerPrefs.GetFloat("xAxis").ToString();
 		optionsAnim = GameObject.FindGameObjectWithTag ("OptionsPanel").GetComponent<Animator> ();
 	}
 	

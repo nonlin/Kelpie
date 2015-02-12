@@ -25,7 +25,7 @@ public class NetworkManager : MonoBehaviour {
 	[SerializeField] Canvas mainCanvas;
 	public GameObject player;
 	Queue<string> messages;
-	const int messageCount = 7;
+	const int messageCount = 6;
 	PhotonView photonView;
 	public bool spawning = false; 
 	bool paused = false;
@@ -50,11 +50,14 @@ public class NetworkManager : MonoBehaviour {
 		//Game Managing Stuff
 		ammoText.SetActive (false);
 		pauseCanvas.enabled = false;
+		Screen.lockCursor = false;
 		versionText.SetActive (true);
+		GameObject.FindGameObjectWithTag ("LobbyCam").GetComponent<AudioListener> ().enabled = true;
+
 	}
 	void Update(){
 
-		if(GameObject.FindGameObjectWithTag ("Player") != null && photonView.isMine){
+		/*if(GameObject.FindGameObjectWithTag ("Player") != null && photonView.isMine){
 
 			if (Input.GetKeyDown (KeyCode.Escape)) {
 
@@ -64,8 +67,8 @@ public class NetworkManager : MonoBehaviour {
 					//Time.timeScale = 0;
 					Screen.lockCursor = false;
 					Screen.showCursor = true;
-					GameObject.FindGameObjectWithTag ("Player").GetComponent<CharacterController>().enabled = false;
-					GameObject.FindGameObjectWithTag ("Player").GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().enabled = false;
+					//GameObject.FindGameObjectWithTag ("Player").GetComponent<CharacterController>().enabled = false;
+					//GameObject.FindGameObjectWithTag ("Player").GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().enabled = false;
 					pauseCanvas.enabled = true;
 					mainCanvas.enabled = false;
 					paused = !paused;
@@ -75,8 +78,8 @@ public class NetworkManager : MonoBehaviour {
 					//Time.timeScale = 1;
 					Screen.lockCursor = true;
 					Screen.showCursor = false;
-					GameObject.FindGameObjectWithTag ("Player").GetComponent<CharacterController>().enabled = true;
-					GameObject.FindGameObjectWithTag ("Player").GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().enabled = true;
+				//	GameObject.FindGameObjectWithTag ("Player").GetComponent<CharacterController>().enabled = true;
+				//	GameObject.FindGameObjectWithTag ("Player").GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().enabled = true;
 					pauseCanvas.enabled = false;
 					mainCanvas.enabled = true;
 					paused = !paused;
@@ -84,7 +87,7 @@ public class NetworkManager : MonoBehaviour {
 			}
 
 
-		}
+		}*/
 
 	}
 	void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info){
@@ -140,6 +143,7 @@ public class NetworkManager : MonoBehaviour {
 		AddMessage ("Player " + PhotonNetwork.player.name + " has joined.");
 		Screen.showCursor = false;
 		Screen.lockCursor = true;
+		GameObject.FindGameObjectWithTag ("LobbyCam").GetComponent<AudioListener> ().enabled = false;
 
 	}
 
@@ -148,14 +152,18 @@ public class NetworkManager : MonoBehaviour {
 		sceneCamera.enabled = true; 
 		StartCoroutine ("SpawnPlayer", respawnTime);
 		AddMessage ("Player " + PhotonNetwork.player.name + " has spawned.");
-		//playerStats.Add(new Player(PhotonNetwork.player.name, 0, 0)); 
+		//Enable Lobby Sound
+		GameObject.FindGameObjectWithTag ("LobbyCam").GetComponent<AudioListener> ().enabled = true;
+		 
 
 	}
 
 	IEnumerator SpawnPlayer(float respawnTime){
-		int i = 0;
-		yield return new WaitForSeconds(respawnTime);
 
+		yield return new WaitForSeconds(respawnTime);
+		//Turn Lobby Listner off again
+		GameObject.FindGameObjectWithTag ("LobbyCam").GetComponent<AudioListener> ().enabled = false;
+		//Debug.Log ("<color=red>Joined Room </color>" + PhotonNetwork.player.name + " " + photonView.isMine);
 		int index = Random.Range (0, spawnPoints.Length);
 		//Create/Spawn player on network
 		player = PhotonNetwork.Instantiate ("FPSPlayer", spawnPoints[index].position, spawnPoints[index].rotation, 0);
@@ -164,6 +172,7 @@ public class NetworkManager : MonoBehaviour {
 		//player.GetComponent<PlayerNetworkMover> ().ScoreStats += onDeath;
 		player.GetComponent<PlayerNetworkMover> ().SendNetworkMessage += AddMessage;//"Subscribe" to it
 		sceneCamera.enabled = false;
+		AddMessage ("Spawned Player: " + PhotonNetwork.player.name);
 		//Add player that just spawned to player list. 
 	
 	}
@@ -175,28 +184,16 @@ public class NetworkManager : MonoBehaviour {
 
 	[RPC]
 	void AddMessage_RPC(string message){
+
 		//Update queues for all clients
 		messages.Enqueue (message);
 		if (messages.Count > messageCount) { messages.Dequeue ();}
 		//then write the messages to display on clients screen
 		messageWindow.text = "";
-		foreach (string m in messages) {
-			messageWindow.text += m + "\n"; 		
-		}
+		foreach(string m in messages)
+			messageWindow.text += m + "\n";
 	}
-
-	/*void onDeath(string name){
-
-		Debug.Log ("DEATH!");
-		for(int i = 0; i < players.Count; i++){
-			
-			if(players[i].GetComponent<PlayerNetworkMover>().playerName == name){
-				players[i].GetComponent<PlayerNetworkMover>().deaths++;
-				photonView.RPC ("Score_RPC", PhotonTargets.All, players[i].GetComponent<PlayerNetworkMover>().kills, players[i].GetComponent<PlayerNetworkMover>().deaths++);
-				Debug.Log (players[i].GetComponent<PlayerNetworkMover>().playerName+ " Death Count: " + players[i].GetComponent<PlayerNetworkMover>().deaths++);
-			}
-		}
-	}*/
+	
 
 	void OnApplicationQuit() {
 		PhotonNetwork.Disconnect ();

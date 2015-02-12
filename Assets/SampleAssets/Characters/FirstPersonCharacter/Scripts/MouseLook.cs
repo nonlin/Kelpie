@@ -7,8 +7,8 @@ namespace UnitySampleAssets.Characters.FirstPerson
     [Serializable]
     public class MouseLook
     {
-        public float XSensitivity;
-        public float YSensitivity;
+        public float XSensitivity =15f;
+        public float YSensitivity = 15f;
         public float MinimumX = -360F;
         public float MaximumX = 360F;
         public float MinimumY = -90F;
@@ -19,12 +19,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
         public bool smooth;
         public float smoothtime;
 
-		void Start(){
 
-			XSensitivity = PlayerPrefs.GetFloat ("xAxis");
-			YSensitivity = PlayerPrefs.GetFloat ("yAxis");
-
-		}
 
         public Vector2 UnClamped(float x, float y)
         {

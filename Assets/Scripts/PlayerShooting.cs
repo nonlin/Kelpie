@@ -16,7 +16,7 @@ public class PlayerShooting : MonoBehaviour {
 	int currentImpact = 0;
 	int maxImpacts = 5;
 	bool shooting = false;
-	float damage = 25f; 
+	float damage = 8.5f; 
 	int clipSize = 30;
 	bool reloading = false; 
 	public Text ammoText;

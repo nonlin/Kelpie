@@ -2,9 +2,7 @@
 using System.Collections;
 
 public class GUIManager : MonoBehaviour {
-	
-	string kills = "";
-	string deaths = "";
+
 	// Use this for initialization
 	void Start () {
 
