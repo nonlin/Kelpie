@@ -170,7 +170,6 @@ GameObject:
   - 33: {fileID: 3383354}
   - 136: {fileID: 13683354}
   - 23: {fileID: 2383354}
-  - 114: {fileID: 11493200}
   m_Layer: 12
   m_Name: Capsule
   m_TagString: Untagged
@@ -676,8 +675,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerName: 
-  kills: 0
-  deaths: 0
   AKFire: {fileID: 8300000, guid: eb19c101e680075468ddaa277d8450f3, type: 3}
   AKReload: {fileID: 8300000, guid: f5de39cefa5f73740b51645dc5498d06, type: 3}
   AKEmpty: {fileID: 8300000, guid: d4bc06a9732617c43ad40b79daa9fdd4, type: 3}
@@ -688,6 +685,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 8bc94ec6ed537e743b481638bdcd503d, type: 3}
   - {fileID: 8300000, guid: 5a9383dda6cabc047b7a297602e93eb4, type: 3}
   - {fileID: 8300000, guid: e9714160ce34f2b4ab63ff8c27bd68e1, type: 3}
+  alive: 0
 --- !u!114 &11436688
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -797,18 +795,6 @@ MonoBehaviour:
   - {fileID: 8300000, guid: e9714160ce34f2b4ab63ff8c27bd68e1, type: 3}
   _jumpSound: {fileID: 8300000, guid: 5897aeed9b676024fbb8c694b421a861, type: 3}
   _landSound: {fileID: 8300000, guid: 3b09d59f4499d45428baa7a21e954296, type: 3}
-  isDead: 1
---- !u!114 &11493200
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 183354}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 307ee0e9b96088141b2de4afc2b6cc4f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!124 &12436684
 Behaviour:
   m_ObjectHideFlags: 1

@@ -58,7 +58,7 @@ public class GUIManager : MonoBehaviour {
 
 	}
 
-	public void PauseMenu(){
+	/*public void PauseMenu(){
 
 		GUILayout.BeginArea(new Rect((Screen.height/2),(Screen.width/2), 400,500));
 		//Quit Button
@@ -67,7 +67,7 @@ public class GUIManager : MonoBehaviour {
 		GUILayout.EndVertical();
 
 		GUILayout.EndArea();
-	}
+	}*/
 	/*void OnPhotonPlayerPropertiesChanged(object[] playerAndUpdatedProps) {
 
 		foreach (PhotonPlayer p in PhotonNetwork.playerList) {

@@ -150,6 +150,7 @@ MonoBehaviour:
   mainMenu: {fileID: 0}
   ammoText: {fileID: 0}
   versionText: {fileID: 0}
+  optionsMenu: {fileID: 0}
   userName: {fileID: 0}
   roomName: {fileID: 0}
   roomList: {fileID: 0}

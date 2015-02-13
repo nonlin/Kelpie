@@ -35,6 +35,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	AudioSource audio1;
 	AudioSource[] aSources;
 	Animator anim;
+	PhotonView photonView;
 	//ColliderControl colidcon;
 	[SerializeField] bool alive;
 
@@ -43,6 +44,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	void Start () {
 
 		alive = true; 
+		photonView = GetComponent<PhotonView> ();
 		//Disables my Character Controller interstingly enough. That way I can only enable it for the clien'ts player.  
 		transform.GetComponent<Collider>().enabled = false;
 		//Use this to get current player this script is attached too
@@ -52,9 +54,9 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		anim = GetComponentInChildren<Animator> ();
 		//audio = GetComponentInChildren<AudioSource> ();
 		//If its my player, not anothers
+		Debug.Log ("<color=red>Joined Room </color>" + PhotonNetwork.player.name + " " + photonView.isMine);
 		if (photonView.isMine) {
 
-			Debug.Log ("<color=red>Joined Room </color>" + PhotonNetwork.player.name + " " + photonView.isMine);
 			//Enable CC so we can control character. 
 			transform.GetComponent<Collider>().enabled = true;
 			//Use for Sound toggle
@@ -146,7 +148,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		//Take Damage and check for death
 		
 		health -= damage;
-		Debug.Log ("Got Shot with " + damage + " damage. Is alive: " + alive);
+		Debug.Log ("<color=green>Got Shot with </color>" + damage + " damage. Is alive: " + alive + " PhotonView is" + photonView.isMine);
 		if(health <=0 && alive){
 			
 			alive = false; 

@@ -14,6 +14,7 @@ public class NetworkManager : MonoBehaviour {
 	[SerializeField] GameObject mainMenu;
 	[SerializeField] GameObject ammoText;
 	[SerializeField] GameObject versionText;
+	public GameObject optionsMenu;
 
 	[SerializeField] InputField userName;
 	[SerializeField] InputField roomName;
@@ -52,6 +53,7 @@ public class NetworkManager : MonoBehaviour {
 		pauseCanvas.enabled = false;
 		Screen.lockCursor = false;
 		versionText.SetActive (true);
+		optionsMenu.SetActive (false);
 		GameObject.FindGameObjectWithTag ("LobbyCam").GetComponent<AudioListener> ().enabled = true;
 
 	}
@@ -134,6 +136,7 @@ public class NetworkManager : MonoBehaviour {
 		//Toggle On/Off Lobby GUI and InGame GUI
 		lobbyWindow.SetActive (false);
 		mainMenu.SetActive (false);
+		optionsMenu.SetActive (false);
 		ammoText.SetActive (true);
 		versionText.SetActive (false);
 		//
