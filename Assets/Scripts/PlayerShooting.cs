@@ -20,7 +20,7 @@ public class PlayerShooting : MonoBehaviour {
 	int clipSize = 30;
 	bool reloading = false; 
 	public Text ammoText;
-
+	public Transform target;
 
 	// Use this for initialization
 	void Start () {
@@ -72,8 +72,12 @@ public class PlayerShooting : MonoBehaviour {
 			NM.player.GetComponent<PhotonView>().RPC ("OutOfAmmo",PhotonTargets.All);
 		}
 
-	}
+		Vector3 forward = transform.TransformDirection(Vector3.forward) * 10;
+		Debug.DrawRay(transform.position, forward, Color.green);
 
+
+	}
+	
 	IEnumerator Reload(){
 
 		yield return new WaitForSeconds(2.0f);
@@ -87,6 +91,7 @@ public class PlayerShooting : MonoBehaviour {
 		yield return new WaitForSeconds(1.0f);
 		NM.player.GetComponent<PhotonView>().RPC ("OutOfAmmo",PhotonTargets.All);
 	}
+	
 	void FixedUpdate(){
 
 		if (shooting) {
@@ -96,13 +101,14 @@ public class PlayerShooting : MonoBehaviour {
 			RaycastHit hit;
 			if(Physics.Raycast(transform.position, transform.forward, out hit, 50f)){
 
+				Debug.Log ("<color=red>Tag of Hit Object</color> " + hit.transform.tag + " " + hit.transform.name);
 				if(hit.transform.tag == "Player"){
 
 					//Tell all we shot a player and call the RPC function GetShot passing damage runs on person shooting
 					hit.transform.GetComponent<PhotonView>().RPC ("GetShot", PhotonTargets.All, damage, PhotonNetwork.player); 
 					Debug.Log ("<color=red>Target Health</color> " + hit.transform.GetComponent<PlayerNetworkMover>().GetHealth());
 				}
-
+				
 				impacts[currentImpact].transform.position = hit.point;
 				impacts[currentImpact].GetComponent<ParticleSystem>().Emit(1);
 				//impactHole[currentImpact].transform.position = hit.point;
@@ -117,5 +123,12 @@ public class PlayerShooting : MonoBehaviour {
 		}
 	}
 
+	void OnDrawGizmosSelected() {
 
+		if (target != null) {
+			Gizmos.color = Color.blue;
+			Gizmos.DrawLine(transform.position, target.position);
+		}
+	}
+	
 }
