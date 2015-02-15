@@ -36,7 +36,8 @@ namespace UnitySampleAssets.Characters.FirstPerson
 
 		NetworkManager NM;
 		Animator anim;
-		Animator tabAnim;
+		[SerializeField] Animator animEthan;
+
 		GUIManager guiMan;
         ///////////////// non exposed privates /////////////////////////
         private Camera _camera;
@@ -53,12 +54,21 @@ namespace UnitySampleAssets.Characters.FirstPerson
         private float _nextStep = 0f;
         private bool _jumping = false;
 		private float stamina = 100f;
-
+		//
+		private Vector3 moveInput;
+		private float turnAmount;
+		private float forwardAmount;
+		private Vector3 camForward; // The current forward direction of the camera
+		private Vector3 move;
+		private Transform cam; // A reference to the main camera in the scenes transform
+		
 		void Awake(){
 
 			guiMan = GameObject.Find ("NetworkManager").GetComponent<GUIManager> ();
 			NM = GetComponent<NetworkManager> ();
 			anim = GetComponentInChildren<Animator> ();
+
+
 
 		}
         // Use this for initialization
@@ -77,14 +87,25 @@ namespace UnitySampleAssets.Characters.FirstPerson
 			_mouseLook.XSensitivity = PlayerPrefs.GetFloat ("xAxis");
 			_mouseLook.YSensitivity = PlayerPrefs.GetFloat ("yAxis");
 			//players = GameObject.FindGameObjectsWithTag("Player");
-        }
-
-        // Update is called once per frame
-        private void Update()
-        {
-
-            RotateView();
-            // the jump state needs to read here to make sure it is not missed
+			// get the transform of the main camera
+			if (Camera.main != null)
+			{
+				cam = Camera.main.transform;
+			}
+			else
+			{
+				Debug.LogWarning(
+					"Warning: no main camera found. Third person character needs a Camera tagged \"MainCamera\", for camera-relative controls.");
+				// we use self-relative controls in this case, which probably isn't what the user wants, but hey, we warned them!
+			}
+		}
+		
+		// Update is called once per frame
+		private void Update()
+		{
+			
+			RotateView();
+			// the jump state needs to read here to make sure it is not missed
             if (!_jump)
                 _jump = CrossPlatformInputManager.GetButtonDown("Jump");
 
@@ -147,12 +168,14 @@ namespace UnitySampleAssets.Characters.FirstPerson
 
             ProgressStepCycle(speed);
             UpdateCameraPosition(speed);
-        }
 
-
-        private void ProgressStepCycle(float speed)
-        {
-            if (_characterController.velocity.sqrMagnitude > 0 && (_input.x != 0 || _input.y != 0))
+	
+		}
+		
+		
+		private void ProgressStepCycle(float speed)
+		{
+			if (_characterController.velocity.sqrMagnitude > 0 && (_input.x != 0 || _input.y != 0))
                 _stepCycle += (_characterController.velocity.magnitude + (speed*(_isWalking ? 1f : runstepLenghten)))*
                               Time.fixedDeltaTime;
 
@@ -194,7 +217,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
             float horizontal = CrossPlatformInputManager.GetAxis("Horizontal");
             float vertical = CrossPlatformInputManager.GetAxis("Vertical");
 
-            bool waswalking = _isWalking;
+			bool waswalking = _isWalking;
 
 #if !MOBILE_INPUT
             // On standalone builds, walk/run speed is modified by a key press.
@@ -205,6 +228,26 @@ namespace UnitySampleAssets.Characters.FirstPerson
 			if(aim){
 				_isWalking = true; 
 			}
+			if(_isWalking && vertical > 0 )
+				animEthan.SetFloat("Forward", 0.5f);
+			else if(!_isWalking && vertical > 0 )
+				animEthan.SetFloat("Forward", vertical);
+			else
+				animEthan.SetFloat("Forward", vertical);
+
+			if(_isWalking && horizontal > 0 )
+				animEthan.SetFloat("Turn", 0.5f);
+			else if(!_isWalking && vertical > 0 )
+				animEthan.SetFloat("Turn", horizontal);
+			if(_isWalking && horizontal < 0 )
+				animEthan.SetFloat("Turn", -0.5f);
+			else if(!_isWalking && vertical < 0 )
+				animEthan.SetFloat("Turn", horizontal);
+			else
+				animEthan.SetFloat("Turn", horizontal);
+
+			animEthan.SetBool("OnGround",_characterController.isGrounded);
+
 			anim.SetBool("Sprint", !_isWalking);
 			anim.SetBool ("Aim", aim);
 			//Drain Stamina
@@ -260,9 +303,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
 		void OnGUI(){
 
 			if (Input.GetKey(KeyCode.Tab)) {
-				//TabPanel.SetActive (!TabPanel.activeSelf);
-				//TabPanel.SetActive(true);
-				//tabAnim.SetBool ("Show",true);
+
 				guiMan.ScoreBoard();
 			}
 		}

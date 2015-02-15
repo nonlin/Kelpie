@@ -19,6 +19,9 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 
 	bool aim = false;
 	bool sprint = false;
+	bool onGround = true;
+	float Forward = 0f;
+	float turn = 0f;
 	bool initialLoad = true;
 
 	public AudioClip AKFire;
@@ -35,6 +38,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	AudioSource audio1;
 	AudioSource[] aSources;
 	Animator anim;
+	Animator animEthan;
 	PhotonView photonView;
 	//ColliderControl colidcon;
 	[SerializeField] bool alive;
@@ -52,6 +56,8 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		audio0 = aSources [0];
 		audio1 = aSources [1];
 		anim = GetComponentInChildren<Animator> ();
+		animEthan = transform.Find("char_ethan").GetComponent<Animator> ();
+
 		//audio = GetComponentInChildren<AudioSource> ();
 		//If its my player, not anothers
 		Debug.Log ("<color=red>Joined Room </color>" + PhotonNetwork.player.name + " " + photonView.isMine);
@@ -103,6 +109,9 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			//Sync Animation States
 			anim.SetBool ("Aim", aim); 
 			anim.SetBool ("Sprint", sprint); 
+			animEthan.SetBool("OnGround",onGround);
+			animEthan.SetFloat("Forward",Forward);
+			animEthan.SetFloat("Turn",turn);
 			yield return null; 
 		}
 	}
@@ -117,10 +126,11 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			//Sync Animation States
 			stream.SendNext(anim.GetBool ("Aim"));
 			stream.SendNext(anim.GetBool ("Sprint"));
+			stream.SendNext(animEthan.GetBool("OnGround"));
+			stream.SendNext(animEthan.GetFloat("Forward"));
+			stream.SendNext(animEthan.GetFloat("Turn"));
+			//
 			stream.SendNext(alive);
-
-			//stream.SendNext(deaths);
-
 		
 		}
 		else{
@@ -132,6 +142,10 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			//Sync Animation States
 			aim = (bool)stream.ReceiveNext();
 			sprint = (bool)stream.ReceiveNext();
+			onGround = (bool)stream.ReceiveNext();
+			Forward = (float)stream.ReceiveNext();
+			turn = (float)stream.ReceiveNext();
+			//
 			alive = (bool)stream.ReceiveNext();
 			
 		}
