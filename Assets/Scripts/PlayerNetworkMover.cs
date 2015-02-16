@@ -16,6 +16,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	public string playerName; 
 
 	GameObject[] weapons;
+	GameObject[] bodys;
 
 	bool aim = false;
 	bool sprint = false;
@@ -67,7 +68,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			transform.GetComponent<Collider>().enabled = true;
 			//Use for Sound toggle
 			_characterController = GetComponent<CharacterController>();
-			//gameObject.name = PhotonNetwork.player.name;
+	
 			playerName = PhotonNetwork.player.name;
 			//enable each script just for the player being spawned and not the others
 			rigidbody.useGravity = true; 
@@ -85,6 +86,11 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 				if(weapons[i].GetComponentInParent<PlayerNetworkMover>().gameObject.GetInstanceID() == gameObject.GetInstanceID() )
 					weapons[i].layer = 10; 
 			}
+			/*bodys = GameObject.FindGameObjectsWithTag("Body");
+			for(int i = 0; i < bodys.Length; i++){
+				if(bodys[i].GetComponentInParent<PlayerNetworkMover>().gameObject.GetInstanceID() == gameObject.GetInstanceID() )
+					bodys[i].layer = 11; 
+			}*/
 
 		}
 		else{
@@ -120,6 +126,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 
 		if (stream.isWriting) {
 			//send to clients where we are
+			stream.SendNext(playerName);
 			stream.SendNext(transform.position);
 			stream.SendNext(transform.rotation);
 			stream.SendNext(health); 
@@ -136,6 +143,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		else{
 			//Get from clients where they are
 			//Write in teh same order we read, if not writing we are reading. 
+			playerName = (string)stream.ReceiveNext();
 			position = (Vector3)stream.ReceiveNext();
 			rotation = (Quaternion)stream.ReceiveNext();
 			health = (float)stream.ReceiveNext();

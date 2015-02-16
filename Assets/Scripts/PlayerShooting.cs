@@ -10,6 +10,12 @@ public class PlayerShooting : MonoBehaviour {
 	private float timeStamp ;
 	//public GameObject bulletHole;
 
+	//To show name when looked at
+	GUIManager guiMan;
+	Transform enemyTransform;
+	bool showEnemyName = false; 
+	string enemyName;
+	//For Impact Holes and Impact Effects
 	GameObject[] impacts;
 	GameObject[] impactHole;
 	NetworkManager NM;
@@ -25,7 +31,7 @@ public class PlayerShooting : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-
+		guiMan = GameObject.Find ("NetworkManager").GetComponent<GUIManager> ();
 		NM = GameObject.Find ("NetworkManager").GetComponent<NetworkManager> ();
 		impacts = new GameObject[maxImpacts];
 		ammoText = GameObject.FindGameObjectWithTag ("Ammo").GetComponent<Text>();
@@ -75,6 +81,23 @@ public class PlayerShooting : MonoBehaviour {
 		Vector3 forward = transform.TransformDirection(Vector3.forward) * 10;
 		Debug.DrawRay(transform.position, forward, Color.green);
 
+		Vector3 fwd = transform.TransformDirection(Vector3.forward);
+		RaycastHit hit; 
+		if (Physics.Raycast (transform.position, transform.forward, out hit, 50f)) {
+				
+			if(hit.transform.tag == "Player"){
+
+				enemyTransform = hit.transform;
+				enemyName = hit.transform.GetComponent<PlayerNetworkMover>().playerName;
+				showEnemyName = true; 
+				//Debug.Log ("<color=red>Player Found</color> " + enemyTransform.position.x + " " + enemyName);
+			}
+			else{
+
+				showEnemyName = false; 
+			}
+		}
+			
 
 	}
 	
@@ -129,6 +152,12 @@ public class PlayerShooting : MonoBehaviour {
 			Gizmos.color = Color.blue;
 			Gizmos.DrawLine(transform.position, target.position);
 		}
+	}
+
+	void OnGUI(){
+
+		if(showEnemyName)
+			guiMan.EnemyName (enemyTransform, enemyName);
 	}
 	
 }

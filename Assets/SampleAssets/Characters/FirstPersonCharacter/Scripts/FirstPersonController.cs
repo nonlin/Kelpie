@@ -228,28 +228,38 @@ namespace UnitySampleAssets.Characters.FirstPerson
 			if(aim){
 				_isWalking = true; 
 			}
+			//Walking Animation Logic Forward
 			if(_isWalking && vertical > 0 )
 				animEthan.SetFloat("Forward", 0.5f);
 			else if(!_isWalking && vertical > 0 )
 				animEthan.SetFloat("Forward", vertical);
 			else
 				animEthan.SetFloat("Forward", vertical);
+			//Backwards
+			if(_isWalking && vertical < 0 )
+				animEthan.SetFloat("Forward", -0.5f);
+			else if(!_isWalking && vertical < 0 )
+				animEthan.SetFloat("Forward", vertical);
 
+			//Turning Right
 			if(_isWalking && horizontal > 0 )
 				animEthan.SetFloat("Turn", 0.5f);
 			else if(!_isWalking && vertical > 0 )
 				animEthan.SetFloat("Turn", horizontal);
+			//Turning Left
 			if(_isWalking && horizontal < 0 )
 				animEthan.SetFloat("Turn", -0.5f);
 			else if(!_isWalking && vertical < 0 )
 				animEthan.SetFloat("Turn", horizontal);
 			else
 				animEthan.SetFloat("Turn", horizontal);
-
+			//Jumping
 			animEthan.SetBool("OnGround",_characterController.isGrounded);
 
+			//Weapon Animations
 			anim.SetBool("Sprint", !_isWalking);
 			anim.SetBool ("Aim", aim);
+
 			//Drain Stamina
 			if(!_isWalking && _characterController.velocity.x > 1){
 				stamina = stamina-0.9f;

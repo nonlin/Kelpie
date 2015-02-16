@@ -3,6 +3,7 @@ using System.Collections;
 
 public class GUIManager : MonoBehaviour {
 
+	public GUIStyle TargetNameStyle;
 	// Use this for initialization
 	void Start () {
 
@@ -58,6 +59,17 @@ public class GUIManager : MonoBehaviour {
 
 	}
 
+	public void EnemyName(Transform location, string enemyName){
+
+		Vector3 characterPos = Camera.main.WorldToScreenPoint(location.position);
+		
+		characterPos = new Vector3(Mathf.Clamp(characterPos.x,0 + (100 / 2),Screen.width - (100 / 2)),
+		                           Mathf.Clamp(characterPos.y,50,Screen.height),
+		                           characterPos.z);
+		GUI.Label (new Rect (characterPos.x,characterPos.y, 100, 50), enemyName,TargetNameStyle);
+		//GUILayout.Label(enemyName,
+
+	}
 	/*public void PauseMenu(){
 
 		GUILayout.BeginArea(new Rect((Screen.height/2),(Screen.width/2), 400,500));
