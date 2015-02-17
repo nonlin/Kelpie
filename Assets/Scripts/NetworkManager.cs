@@ -20,10 +20,10 @@ public class NetworkManager : MonoBehaviour {
 	[SerializeField] InputField roomName;
 	[SerializeField] InputField roomList;
 	[SerializeField] InputField messageWindow;
-	//[SerializeField] Text textKills;
-	//[SerializeField] Text textDeaths;
-	[SerializeField] Canvas pauseCanvas;
+
+	[SerializeField] GameObject pausePanel;
 	[SerializeField] Canvas mainCanvas;
+
 	public GameObject player;
 	Queue<string> messages;
 	const int messageCount = 6;
@@ -50,7 +50,7 @@ public class NetworkManager : MonoBehaviour {
 		//PhotonNetwork.player.SetCustomProperties(setPlayerHealth);
 		//Game Managing Stuff
 		ammoText.SetActive (false);
-		pauseCanvas.enabled = false;
+		pausePanel.SetActive(false);
 		Screen.lockCursor = false;
 		versionText.SetActive (true);
 		optionsMenu.SetActive (false);
@@ -59,7 +59,7 @@ public class NetworkManager : MonoBehaviour {
 	}
 	void Update(){
 
-		/*if(GameObject.FindGameObjectWithTag ("Player") != null && photonView.isMine){
+		if(player != null && photonView.isMine){
 
 			if (Input.GetKeyDown (KeyCode.Escape)) {
 
@@ -69,10 +69,11 @@ public class NetworkManager : MonoBehaviour {
 					//Time.timeScale = 0;
 					Screen.lockCursor = false;
 					Screen.showCursor = true;
-					//GameObject.FindGameObjectWithTag ("Player").GetComponent<CharacterController>().enabled = false;
-					//GameObject.FindGameObjectWithTag ("Player").GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().enabled = false;
-					pauseCanvas.enabled = true;
-					mainCanvas.enabled = false;
+					//Disable Shooting and movement
+					player.GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().enabled = false;
+					player.GetComponentInChildren<PlayerShooting>().enabled = false;
+					pausePanel.SetActive(true);
+					//mainCanvas.enabled = false;
 					paused = !paused;
 				}
 				else{
@@ -80,16 +81,17 @@ public class NetworkManager : MonoBehaviour {
 					//Time.timeScale = 1;
 					Screen.lockCursor = true;
 					Screen.showCursor = false;
-				//	GameObject.FindGameObjectWithTag ("Player").GetComponent<CharacterController>().enabled = true;
-				//	GameObject.FindGameObjectWithTag ("Player").GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().enabled = true;
-					pauseCanvas.enabled = false;
-					mainCanvas.enabled = true;
+					//Re-Enable
+					player.GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().enabled = true;
+					player.GetComponentInChildren<PlayerShooting>().enabled = true;
+					pausePanel.SetActive(false);
+					//mainCanvas.enabled = true;
 					paused = !paused;
 				}
 			}
 
 
-		}*/
+		}
 
 	}
 	void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info){
@@ -174,6 +176,7 @@ public class NetworkManager : MonoBehaviour {
 		player.GetComponent<PlayerNetworkMover> ().RespawnMe += StartSpawnProcess;
 		//player.GetComponent<PlayerNetworkMover> ().ScoreStats += onDeath;
 		player.GetComponent<PlayerNetworkMover> ().SendNetworkMessage += AddMessage;//"Subscribe" to it
+
 		sceneCamera.enabled = false;
 		AddMessage ("Spawned Player: " + PhotonNetwork.player.name);
 		//Add player that just spawned to player list. 
@@ -196,7 +199,6 @@ public class NetworkManager : MonoBehaviour {
 		foreach(string m in messages)
 			messageWindow.text += m + "\n";
 	}
-	
 
 	void OnApplicationQuit() {
 		PhotonNetwork.Disconnect ();

@@ -18,15 +18,15 @@ public class GameManager : MonoBehaviour {
 		yAxis_Text.text = PlayerPrefs.GetFloat("yAxis").ToString();
 		xAxis_Text.text = PlayerPrefs.GetFloat("xAxis").ToString();
 		optionsAnim = GameObject.FindGameObjectWithTag ("OptionsPanel").GetComponent<Animator> ();
+
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
-		Vector3 fwd = transform.TransformDirection(Vector3.forward);
-		if (Physics.Raycast(transform.position, fwd, 10))
-			print("There is something in front of the object!");
+
 	}
+
 
 	public void SetMouseX(float xAxis){
 		

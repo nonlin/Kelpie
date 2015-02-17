@@ -17,6 +17,8 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 
 	GameObject[] weapons;
 	GameObject[] bodys;
+	//public GameObject injuryEffect;
+	//Animator injuryAnim;
 
 	bool aim = false;
 	bool sprint = false;
@@ -58,6 +60,8 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		audio1 = aSources [1];
 		anim = GetComponentInChildren<Animator> ();
 		animEthan = transform.Find("char_ethan").GetComponent<Animator> ();
+		//injuryAnim = GameObject.Find ("InjuryEffect").GetComponent<Animator>();
+		//injuryAnim = injuryEffect.GetComponent<Animator> ();
 
 		//audio = GetComponentInChildren<AudioSource> ();
 		//If its my player, not anothers
@@ -170,6 +174,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		//Take Damage and check for death
 		
 		health -= damage;
+	
 		Debug.Log ("<color=green>Got Shot with </color>" + damage + " damage. Is alive: " + alive + " PhotonView is" + photonView.isMine);
 		if(health <=0 && alive){
 			
@@ -208,6 +213,9 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 				}
 			}
 		}
+		//injuryEffect.SetActive (true);
+		//injuryAnim.SetBool ("Hit", true);
+		StartCoroutine( WaitForAnimation (2.0f));
 	}
 
 
@@ -284,5 +292,12 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			gameObject.GetComponent<PhotonView>().RPC ("GetShot", PhotonTargets.All, 25f, PhotonNetwork.player);
 			Debug.Log (health);
 		}
+	}
+
+	private IEnumerator WaitForAnimation ( float waitTime )
+	{
+		yield return new WaitForSeconds(waitTime);
+		//injuryAnim.SetBool ("Hit", false);
+		//injuryEffect.SetActive (false);
 	}
 }
