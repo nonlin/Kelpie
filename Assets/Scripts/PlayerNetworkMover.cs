@@ -18,7 +18,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	GameObject[] weapons;
 	GameObject[] bodys;
 	//public GameObject injuryEffect;
-	//Animator injuryAnim;
+	Animator injuryAnim;
 
 	bool aim = false;
 	bool sprint = false;
@@ -63,7 +63,8 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		audio1 = aSources [1];
 		anim = GetComponentInChildren<Animator> ();
 		animEthan = transform.Find("char_ethan").GetComponent<Animator> ();
-		//injuryAnim = GameObject.Find ("InjuryEffect").GetComponent<Animator>();
+		injuryAnim = GameObject.FindGameObjectWithTag ("InjuryEffect").GetComponent<Animator>();
+		//injuryEffect = GameObject.Find ("InjuryEffect");
 		//injuryAnim = injuryEffect.GetComponent<Animator> ();
 
 		//audio = GetComponentInChildren<AudioSource> ();
@@ -212,9 +213,11 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 					
 			}
 		}
-		//injuryEffect.SetActive (true);
-		//injuryAnim.SetBool ("Hit", true);
-		//StartCoroutine( WaitForAnimation (2.0f));
+		//Play Hit Effect Animation for player getting hit. Without isMine would play for everyone. 
+		if (photonView.isMine) {
+			injuryAnim.SetBool ("Hit", true);
+			StartCoroutine( WaitForAnimation (1.2f));
+		}
 	}
 
 
@@ -296,7 +299,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	private IEnumerator WaitForAnimation ( float waitTime )
 	{
 		yield return new WaitForSeconds(waitTime);
-		//injuryAnim.SetBool ("Hit", false);
+		injuryAnim.SetBool ("Hit", false);
 		//injuryEffect.SetActive (false);
 	}
 }
