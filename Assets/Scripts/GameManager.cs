@@ -14,6 +14,12 @@ public class GameManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
+		//Set Default Mouse Settings if there isn't one
+		if(PlayerPrefs.GetFloat("xAxis") <= 0f || PlayerPrefs.GetFloat("yAxis") <= 0f){
+			PlayerPrefs.SetFloat ("xAxis", 15f);
+			PlayerPrefs.SetFloat ("yAxis", 15f);
+		}
+
 		NM = GameObject.FindGameObjectWithTag ("NetworkManager").GetComponent<NetworkManager> ();
 		yAxis_Text.text = PlayerPrefs.GetFloat("yAxis").ToString();
 		xAxis_Text.text = PlayerPrefs.GetFloat("xAxis").ToString();

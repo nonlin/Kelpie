@@ -27,10 +27,13 @@ public class PlayerShooting : MonoBehaviour {
 	bool reloading = false; 
 	public Text ammoText;
 	public Transform target;
-
+	private Vector3 start;
+	private Vector3 line;
 	// Use this for initialization
 	void Start () {
 
+		start = transform.position;
+		line = transform.position;
 		guiMan = GameObject.Find ("NetworkManager").GetComponent<GUIManager> ();
 		NM = GameObject.Find ("NetworkManager").GetComponent<NetworkManager> ();
 		impacts = new GameObject[maxImpacts];
@@ -78,27 +81,47 @@ public class PlayerShooting : MonoBehaviour {
 			NM.player.GetComponent<PhotonView>().RPC ("OutOfAmmo",PhotonTargets.All);
 		}
 
-		Vector3 forward = transform.TransformDirection(Vector3.forward) * 10;
-		Debug.DrawRay(transform.position, forward, Color.green);
+		if (shooting) {
+			
+			shooting = false; 
+			
+			RaycastHit hit;
+			Debug.Log("Origin: " + transform.position + ", direction: " + transform.forward);
+			Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width*0.5f, Screen.height*0.5f, 0));;
+			Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
 
-		Vector3 fwd = transform.TransformDirection(Vector3.forward);
-		RaycastHit hit; 
-		if (Physics.Raycast (transform.position, transform.forward, out hit, 50f)) {
+			if(Physics.Raycast(ray, out hit, 50f)){
 				
-			if(hit.transform.tag == "Player"){
-
-				enemyTransform = hit.transform;
-				enemyName = hit.transform.GetComponent<PlayerNetworkMover>().playerName;
-				showEnemyName = true; 
-				//Debug.Log ("<color=red>Player Found</color> " + enemyTransform.position.x + " " + enemyName);
-			}
-			else{
-
-				showEnemyName = false; 
+				Debug.Log ("<color=red>Tag of Hit Object</color> " + hit.transform.tag + " " + hit.transform.name);
+				if(hit.transform.tag == "Player"){
+					
+					if(hit.collider.tag == "Head"){
+						Debug.Log ("<color=red>HeadShot!</color> " + hit.collider.name);
+						damage = 100f; 
+					}
+					if(hit.collider.tag == "Body"){
+						damage = 16f;
+					}
+					Debug.Log ("<color=red>Collider Tag</color> " + hit.collider.tag);
+					
+					//Tell all we shot a player and call the RPC function GetShot passing damage runs on person shooting
+					hit.transform.GetComponent<PhotonView>().RPC ("GetShot", PhotonTargets.All, damage, PhotonNetwork.player); 
+					Debug.Log ("<color=red>Target Health</color> " + hit.transform.GetComponent<PlayerNetworkMover>().GetHealth());
+				}
+				
+				impacts[currentImpact].transform.position = hit.point;
+				line = hit.point;
+				impacts[currentImpact].GetComponent<ParticleSystem>().Emit(1);
+				//impactHole[currentImpact].transform.position = hit.point;
+				//impacts[currentImpact].GetComponent<ParticleSystem>().Emit(1);
+				if(++currentImpact >= maxImpacts){
+					currentImpact = 0; 
+				}
+				if(currentImpact >= maxImpacts){
+					
+				}
 			}
 		}
-			
-
 	}
 	
 	IEnumerator Reload(){
@@ -116,34 +139,8 @@ public class PlayerShooting : MonoBehaviour {
 	}
 	
 	void FixedUpdate(){
+		//For Physic related stuff like adding force to rigidbody apprently 
 
-		if (shooting) {
-		
-			shooting = false; 
-
-			RaycastHit hit;
-			if(Physics.Raycast(transform.position, transform.forward, out hit, 50f)){
-
-				Debug.Log ("<color=red>Tag of Hit Object</color> " + hit.transform.tag + " " + hit.transform.name);
-				if(hit.transform.tag == "Player"){
-
-					//Tell all we shot a player and call the RPC function GetShot passing damage runs on person shooting
-					hit.transform.GetComponent<PhotonView>().RPC ("GetShot", PhotonTargets.All, damage, PhotonNetwork.player); 
-					Debug.Log ("<color=red>Target Health</color> " + hit.transform.GetComponent<PlayerNetworkMover>().GetHealth());
-				}
-				
-				impacts[currentImpact].transform.position = hit.point;
-				impacts[currentImpact].GetComponent<ParticleSystem>().Emit(1);
-				//impactHole[currentImpact].transform.position = hit.point;
-				//impacts[currentImpact].GetComponent<ParticleSystem>().Emit(1);
-				if(++currentImpact >= maxImpacts){
-					currentImpact = 0; 
-				}
-				if(currentImpact >= maxImpacts){
-
-				}
-			}
-		}
 	}
 
 	void OnDrawGizmosSelected() {

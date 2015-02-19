@@ -49,9 +49,12 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	//AudioSource audio;
 	// Use this for initialization
 	void Start () {
-
+	
 		alive = true; 
 		photonView = GetComponent<PhotonView> ();
+		//If player is ours haave CC ignore body parts
+		if(photonView.isMine)
+			Physics.IgnoreLayerCollision(0,12, true);
 		//Disables my Character Controller interstingly enough. That way I can only enable it for the clien'ts player.  
 		transform.GetComponent<Collider>().enabled = false;
 		//Use this to get current player this script is attached too
@@ -202,7 +205,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			}
 			else{
 				
-				if(PhotonNetwork.player == enemy){
+				if(PhotonNetwork.player == enemy && alive == false){
 					
 					int totalKIlls = (int)PhotonNetwork.player.customProperties["K"];
 					totalKIlls ++;
@@ -215,7 +218,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		}
 		//injuryEffect.SetActive (true);
 		//injuryAnim.SetBool ("Hit", true);
-		StartCoroutine( WaitForAnimation (2.0f));
+		//StartCoroutine( WaitForAnimation (2.0f));
 	}
 
 
