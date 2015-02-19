@@ -175,7 +175,6 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	[RPC]
 	public void GetShot(float damage, PhotonPlayer enemy){
 		//Take Damage and check for death
-		
 		health -= damage;
 	
 		Debug.Log ("<color=green>Got Shot with </color>" + damage + " damage. Is alive: " + alive + " PhotonView is" + photonView.isMine);
@@ -197,23 +196,20 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 				totalDeaths ++;
 				ExitGames.Client.Photon.Hashtable setPlayerDeaths = new ExitGames.Client.Photon.Hashtable() {{"D", totalDeaths}};
 				PhotonNetwork.player.SetCustomProperties(setPlayerDeaths);
+
 				//Destroy Object on network
 				Debug.Log ("<color=green> Collider State After</color>"+transform.GetComponent<Collider>().enabled.ToString());
 				PhotonNetwork.Destroy(gameObject);
 				foreach(PhotonPlayer p in PhotonNetwork.playerList)
-					Debug.Log ("<color=red>PlayerLIst</color>" + p.name);
-			}
-			else{
-				
-				if(PhotonNetwork.player == enemy && alive == false){
+				Debug.Log ("<color=red>PlayerLIst</color>" + p.name);
+
+				//Increment Kill Count for the enemy player
+				int totalKIlls = (int)enemy.customProperties["K"];
+				totalKIlls ++;
+				ExitGames.Client.Photon.Hashtable setPlayerKills = new ExitGames.Client.Photon.Hashtable() {{"K", totalKIlls}};
+				Debug.Log ("<color=red>KillCounter Called at </color>" + totalKIlls);
+				enemy.SetCustomProperties(setPlayerKills);
 					
-					int totalKIlls = (int)PhotonNetwork.player.customProperties["K"];
-					totalKIlls ++;
-					ExitGames.Client.Photon.Hashtable setPlayerKills = new ExitGames.Client.Photon.Hashtable() {{"K", totalKIlls}};
-					Debug.Log ("<color=red>KillCounter Called at </color>" + totalKIlls);
-					PhotonNetwork.player.SetCustomProperties(setPlayerKills);
-					
-				}
 			}
 		}
 		//injuryEffect.SetActive (true);
