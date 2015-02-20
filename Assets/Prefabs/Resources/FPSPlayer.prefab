@@ -1952,7 +1952,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 168064}
   m_LocalRotation: {x: 0, y: -.00820055697, z: 0, w: .999966383}
-  m_LocalPosition: {x: .00499999989, y: -.972000003, z: -.448000014}
+  m_LocalPosition: {x: .00499999989, y: -.972000003, z: -.437999994}
   m_LocalScale: {x: 1.18472111, y: 1.18472159, z: 1.18472159}
   m_Children:
   - {fileID: 468046}
@@ -3299,7 +3299,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerName: 
-  hitPanel: {fileID: 0}
   AKFire: {fileID: 8300000, guid: eb19c101e680075468ddaa277d8450f3, type: 3}
   AKReload: {fileID: 8300000, guid: f5de39cefa5f73740b51645dc5498d06, type: 3}
   AKEmpty: {fileID: 8300000, guid: d4bc06a9732617c43ad40b79daa9fdd4, type: 3}
@@ -3556,13 +3555,13 @@ CharacterController:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 168068}
   serializedVersion: 2
-  m_Height: 2
-  m_Radius: .5
+  m_Height: 2.20000005
+  m_Radius: .400000006
   m_SlopeLimit: 45
   m_StepOffset: .300000012
   m_SkinWidth: .0799999982
   m_MinMoveDistance: 0
-  m_Center: {x: 0, y: 0, z: -.49000001}
+  m_Center: {x: 0, y: .100000001, z: -.449999988}
 --- !u!198 &19867874
 ParticleSystem:
   m_ObjectHideFlags: 1
@@ -5599,7 +5598,7 @@ ParticleSystemRenderer:
   m_LightmapIndex: 255
   m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
   m_Materials:
-  - {fileID: 2100000, guid: c50d77affeb31e14c9c062c282f13fc8, type: 2}
+  - {fileID: 2100000, guid: 57025ae92567f124d91874371a570e3d, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0

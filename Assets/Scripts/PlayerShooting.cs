@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class PlayerShooting : MonoBehaviour {
@@ -16,36 +17,24 @@ public class PlayerShooting : MonoBehaviour {
 	bool showEnemyName = false; 
 	string enemyName;
 	//For Impact Holes and Impact Effects
-	GameObject[] impacts;
-	GameObject[] impactHole;
+	Queue<GameObject> impacts = new Queue<GameObject>();
+	//GameObject[] impacts;
 	NetworkManager NM;
 	int currentImpact = 0;
-	int maxImpacts = 5;
+	int maxImpacts = 20;
 	bool shooting = false;
 	float damage = 16f; 
 	int clipSize = 30;
 	bool reloading = false; 
 	public Text ammoText;
 	public Transform target;
-	private Vector3 start;
-	private Vector3 line;
 	// Use this for initialization
 	void Start () {
 
-		start = transform.position;
-		line = transform.position;
 		guiMan = GameObject.Find ("NetworkManager").GetComponent<GUIManager> ();
 		NM = GameObject.Find ("NetworkManager").GetComponent<NetworkManager> ();
-		impacts = new GameObject[maxImpacts];
+	
 		ammoText = GameObject.FindGameObjectWithTag ("Ammo").GetComponent<Text>();
-		for (int i = 0; i < maxImpacts; i++){
-			impacts [i] = (GameObject)Instantiate (impactPrefab);
-			//impactHole[i] = (GameObject)Instantiate(bulletHole);
-		}
-		
-		for(int i = 0; i < maxImpacts; i++)
-			impacts[i].transform.parent = gameObject.transform;
-
 		anim = GetComponentInChildren<Animator> ();
 		timeStamp = 0; 
 
@@ -108,17 +97,16 @@ public class PlayerShooting : MonoBehaviour {
 					hit.transform.GetComponent<PhotonView>().RPC ("GetShot", PhotonTargets.All, damage, PhotonNetwork.player); 
 					Debug.Log ("<color=red>Target Health</color> " + hit.transform.GetComponent<PlayerNetworkMover>().GetHealth());
 				}
-				
-				impacts[currentImpact].transform.position = hit.point;
-				line = hit.point;
-				impacts[currentImpact].GetComponent<ParticleSystem>().Emit(1);
-				//impactHole[currentImpact].transform.position = hit.point;
-				//impacts[currentImpact].GetComponent<ParticleSystem>().Emit(1);
-				if(++currentImpact >= maxImpacts){
-					currentImpact = 0; 
-				}
-				if(currentImpact >= maxImpacts){
-					
+
+				//Get hit roatoin and then push a new gameobject at pos and roatation of the object we hit thanks to ray hit
+				Quaternion hitRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+				impacts.Enqueue((GameObject)Instantiate (impactPrefab,hit.point,hitRotation));
+				impacts.Peek().GetComponent<ParticleSystem>().Emit(1);
+	
+				if(impacts.Count >= maxImpacts){
+					//Once we've pushed to our impact limit destroy the first gameobject we pushed. FIFO thanks to Queues
+					Destroy(impacts.Dequeue());
+
 				}
 			}
 		}
