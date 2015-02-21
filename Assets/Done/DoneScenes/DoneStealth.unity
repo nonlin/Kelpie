@@ -8898,7 +8898,27 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11495312, guid: f1f12b01a444d6349b6bf59d13af7aef, type: 2}
       propertyPath: m_Text
-      value: Version 0.6ss
+      value: Version 0.6s
+      objectReference: {fileID: 0}
+    - target: {fileID: 22472240, guid: f1f12b01a444d6349b6bf59d13af7aef, type: 2}
+      propertyPath: m_AnchoredPosition.x
+      value: -56.7999992
+      objectReference: {fileID: 0}
+    - target: {fileID: 22472240, guid: f1f12b01a444d6349b6bf59d13af7aef, type: 2}
+      propertyPath: m_SizeDelta.x
+      value: -84.1999969
+      objectReference: {fileID: 0}
+    - target: {fileID: 22472240, guid: f1f12b01a444d6349b6bf59d13af7aef, type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: 1.375
+      objectReference: {fileID: 0}
+    - target: {fileID: 22472240, guid: f1f12b01a444d6349b6bf59d13af7aef, type: 2}
+      propertyPath: m_SizeDelta.y
+      value: 21.6499996
+      objectReference: {fileID: 0}
+    - target: {fileID: 172228, guid: f1f12b01a444d6349b6bf59d13af7aef, type: 2}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f1f12b01a444d6349b6bf59d13af7aef, type: 2}
@@ -46490,7 +46510,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Version 0.6ss
+  m_Text: Version 0.6s
 --- !u!222 &1802017664
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -50290,8 +50310,8 @@ RectTransform:
   m_RootOrder: 2
   m_AnchorMin: {x: .00999999978, y: .00999999978}
   m_AnchorMax: {x: .200000003, y: .100000001}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -56.7999992, y: 1.375}
+  m_SizeDelta: {x: -84.1999969, y: 21.6499996}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &1969634119
 MonoBehaviour:

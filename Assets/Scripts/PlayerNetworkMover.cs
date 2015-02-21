@@ -48,7 +48,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	PhotonView photonView;
 	//ColliderControl colidcon;
 	[SerializeField] bool alive;
-
+	NetworkManager NM;
 	//AudioSource audio;
 	// Use this for initialization
 	void Start () {
@@ -65,7 +65,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		anim = GetComponentInChildren<Animator> ();
 		animEthan = transform.Find("char_ethan").GetComponent<Animator> ();
 		injuryAnim = GameObject.FindGameObjectWithTag ("InjuryEffect").GetComponent<Animator>();
-
+		NM = GameObject.FindGameObjectWithTag ("NetworkManager").GetComponent<NetworkManager>();
 		//If its my player, not anothers
 		Debug.Log ("<color=red>Joined Room </color>" + PhotonNetwork.player.name + " " + photonView.isMine);
 		if (photonView.isMine) {
@@ -204,6 +204,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			alive = false; 
 			Debug.Log ("<color=blue>Checking Health</color>" + health + " Photon State " + photonView.isMine + " Player Name " + PhotonNetwork.player.name);
 			if (photonView.isMine) {
+
 				Debug.Log ("<color=red>Death</color>");
 				if(SendNetworkMessage != null){
 					SendNetworkMessage(PhotonNetwork.player.name + " got owned by " + enemy.name);
@@ -328,5 +329,12 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		yield return new WaitForSeconds(waitTime);
 		injuryAnim.SetBool ("Hit", false);
 		//injuryEffect.SetActive (false);
+	}
+
+	void OnDestroy() {
+		// Unsubscribe, so this object can be collected by the garbage collection
+		RespawnMe -=  NM.StartSpawnProcess;
+		SendNetworkMessage -= NM.AddMessage;
+
 	}
 }

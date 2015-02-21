@@ -152,7 +152,7 @@ public class NetworkManager : MonoBehaviour {
 
 	}
 
-	void StartSpawnProcess (float respawnTime){
+	public void StartSpawnProcess (float respawnTime){
 		//Show Lobby cam on death vs blank screen
 		sceneCamera.enabled = true; 
 		StartCoroutine ("SpawnPlayer", respawnTime);
@@ -183,7 +183,7 @@ public class NetworkManager : MonoBehaviour {
 	
 	}
 
-	void AddMessage(string message){
+	public void AddMessage(string message){
 
 		photonView.RPC ("AddMessage_RPC", PhotonTargets.All, message);
 	}
@@ -196,6 +196,7 @@ public class NetworkManager : MonoBehaviour {
 		if (messages.Count > messageCount) { messages.Dequeue ();}
 		//then write the messages to display on clients screen
 		messageWindow.text = "";
+		Debug.Log ("<color=red>Messages Count</color>" +messages.Count);
 		foreach(string m in messages)
 			messageWindow.text += m + "\n";
 	}
