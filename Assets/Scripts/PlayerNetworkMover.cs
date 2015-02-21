@@ -33,12 +33,15 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	[SerializeField] private AudioClip _jumpSound; // the sound played when character leaves the ground.
 	[SerializeField] private AudioClip _landSound; // the sound played when character touches back on ground.
 	[SerializeField] private AudioClip[] _footstepSounds;
+	[SerializeField] private AudioClip[] fleshImpactSounds;
+	[SerializeField] private AudioClip[] flyByShots;
 	private CharacterController _characterController;
 	private float _stepCycle = 0f;
 	private float _nextStep = 0f;
 	//CharacterController cc;
 	AudioSource audio0;
 	AudioSource audio1;
+	AudioSource audio2;
 	AudioSource[] aSources;
 	Animator anim;
 	Animator animEthan;
@@ -52,22 +55,17 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	
 		alive = true; 
 		photonView = GetComponent<PhotonView> ();
-		//If player is ours haave CC ignore body parts
-		if(photonView.isMine)
-			Physics.IgnoreLayerCollision(0,12, true);
 		//Disables my Character Controller interstingly enough. That way I can only enable it for the clien'ts player.  
 		transform.GetComponent<Collider>().enabled = false;
 		//Use this to get current player this script is attached too
 		aSources = GetComponents<AudioSource> (); 
 		audio0 = aSources [0];
 		audio1 = aSources [1];
+		audio2 = aSources [2];
 		anim = GetComponentInChildren<Animator> ();
 		animEthan = transform.Find("char_ethan").GetComponent<Animator> ();
 		injuryAnim = GameObject.FindGameObjectWithTag ("InjuryEffect").GetComponent<Animator>();
-		//injuryEffect = GameObject.Find ("InjuryEffect");
-		//injuryAnim = injuryEffect.GetComponent<Animator> ();
 
-		//audio = GetComponentInChildren<AudioSource> ();
 		//If its my player, not anothers
 		Debug.Log ("<color=red>Joined Room </color>" + PhotonNetwork.player.name + " " + photonView.isMine);
 		if (photonView.isMine) {
@@ -94,6 +92,25 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 				if(weapons[i].GetComponentInParent<PlayerNetworkMover>().gameObject.GetInstanceID() == gameObject.GetInstanceID() )
 					weapons[i].layer = 10; 
 			}
+			//Change Body Part Collider Layers from default to body just for the player's own game not all players so that they can collide with others
+			//We need to ignore colliders cause we layer a lot of them together
+			//So we find all body parts and if it matches our own we are good to change it so it can be ignored.
+			for(int i = 0; i < GameObject.FindGameObjectsWithTag("Body").Length; i++){
+
+				if(GameObject.FindGameObjectsWithTag("Body")[i].GetComponentInParent<PlayerNetworkMover>().gameObject.GetInstanceID() == gameObject.GetInstanceID() ){
+					GameObject.FindGameObjectsWithTag("Body")[i].layer = 12;
+				}
+			}
+			//Now for the head
+			for(int i = 0; i < GameObject.FindGameObjectsWithTag("Head").Length; i++){
+				
+				if(GameObject.FindGameObjectsWithTag("Head")[i].GetComponentInParent<PlayerNetworkMover>().gameObject.GetInstanceID() == gameObject.GetInstanceID() ){
+					GameObject.FindGameObjectsWithTag("Head")[i].layer = 12;
+				}
+			}
+			//If player is ours have CC ignore body parts
+			Physics.IgnoreLayerCollision(0,12, true);
+
 			/*bodys = GameObject.FindGameObjectsWithTag("Body");
 			for(int i = 0; i < bodys.Length; i++){
 				if(bodys[i].GetComponentInParent<PlayerNetworkMover>().gameObject.GetInstanceID() == gameObject.GetInstanceID() )
@@ -177,8 +194,11 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	public void GetShot(float damage, PhotonPlayer enemy){
 		//Take Damage and check for death
 		health -= damage;
-	
+		//Play a random Impact Sounds
+		audio2.clip = fleshImpactSounds [Random.Range (0, 6)];
+		audio2.Play ();
 		Debug.Log ("<color=green>Got Shot with </color>" + damage + " damage. Is alive: " + alive + " PhotonView is" + photonView.isMine);
+		//Once dead
 		if(health <=0 && alive){
 			
 			alive = false; 
@@ -283,6 +303,13 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		// move picked sound to index 0 so it's not picked next time
 		_footstepSounds[n] = _footstepSounds[0];
 		_footstepSounds[0] = audio.clip;
+	}
+
+	[RPC]
+	public void PlayFlyByShots(){
+
+		audio2.clip = flyByShots [Random.Range (0, 12)];
+		audio2.Play ();
 	}
 
 	// Update is called once per frame

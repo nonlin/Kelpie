@@ -82,12 +82,16 @@ public class PlayerShooting : MonoBehaviour {
 			if(Physics.Raycast(ray, out hit, 50f)){
 				
 				Debug.Log ("<color=red>Tag of Hit Object</color> " + hit.transform.tag + " " + hit.transform.name);
-				if(hit.transform.tag == "Player"){
-					
+				if(hit.transform.tag == "Player" && hit.collider.tag != "FlyByRange"){
+
+					//Play hitmarker sound
+					gameObject.GetComponent<AudioSource>().Play();
+					//If we hit the head colliderr change the damage
 					if(hit.collider.tag == "Head"){
 						Debug.Log ("<color=red>HeadShot!</color> " + hit.collider.name);
 						damage = 100f; 
 					}
+					//If we hit the body change the damage
 					if(hit.collider.tag == "Body"){
 						damage = 16f;
 					}
@@ -97,16 +101,28 @@ public class PlayerShooting : MonoBehaviour {
 					hit.transform.GetComponent<PhotonView>().RPC ("GetShot", PhotonTargets.All, damage, PhotonNetwork.player); 
 					Debug.Log ("<color=red>Target Health</color> " + hit.transform.GetComponent<PlayerNetworkMover>().GetHealth());
 				}
+				else{
+					//For objects that are not players 
+					//Get hit roatoin and then push a new gameobject at pos and roatation of the object we hit thanks to ray hit
+					//Dont want to see any decals on the collider for FlyByRange
+					if(hit.collider.tag != "FlyByRange"){
+						Quaternion hitRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+						GameObject CurrentImpact = (GameObject)Instantiate (impactPrefab,hit.point, hitRotation);
+						impacts.Enqueue(CurrentImpact);
+						//impacts.Peek().GetComponent<ParticleSystem>().enableEmission = true; 
+						//impacts.Peek().GetComponent<ParticleSystem>().Play();
+						CurrentImpact.GetComponent<ParticleSystem>().Emit(1);
 
-				//Get hit roatoin and then push a new gameobject at pos and roatation of the object we hit thanks to ray hit
-				Quaternion hitRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
-				impacts.Enqueue((GameObject)Instantiate (impactPrefab,hit.point,hitRotation));
-				impacts.Peek().GetComponent<ParticleSystem>().Emit(1);
-	
+					}
+				}
 				if(impacts.Count >= maxImpacts){
 					//Once we've pushed to our impact limit destroy the first gameobject we pushed. FIFO thanks to Queues
 					Destroy(impacts.Dequeue());
 
+				}
+
+				if(hit.collider.tag == "FlyByRange"){
+					hit.transform.GetComponent<PhotonView>().RPC ("PlayFlyByShots", PhotonTargets.Others); 
 				}
 			}
 		}
