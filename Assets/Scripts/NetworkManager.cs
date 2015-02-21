@@ -146,8 +146,6 @@ public class NetworkManager : MonoBehaviour {
 		connectionText.text = "";
 		StartSpawnProcess (0f);
 		AddMessage ("Player " + PhotonNetwork.player.name + " has joined.");
-		Screen.showCursor = false;
-		Screen.lockCursor = true;
 		GameObject.FindGameObjectWithTag ("LobbyCam").GetComponent<AudioListener> ().enabled = false;
 
 	}
@@ -166,6 +164,8 @@ public class NetworkManager : MonoBehaviour {
 	IEnumerator SpawnPlayer(float respawnTime){
 
 		yield return new WaitForSeconds(respawnTime);
+		Screen.showCursor = false;
+		Screen.lockCursor = true;
 		//Turn Lobby Listner off again
 		GameObject.FindGameObjectWithTag ("LobbyCam").GetComponent<AudioListener> ().enabled = false;
 		//Debug.Log ("<color=red>Joined Room </color>" + PhotonNetwork.player.name + " " + photonView.isMine);
