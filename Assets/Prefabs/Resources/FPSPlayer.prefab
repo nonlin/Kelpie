@@ -3449,6 +3449,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   muzzleFlash: {fileID: 19867874}
   impactPrefab: {fileID: 164778, guid: 6444b6de1c8f7af4fb9294f0044b4f90, type: 2}
+  bloodSplatPrefab: {fileID: 100000, guid: 80cd87e5e66b84b35b29f75198eeda8b, type: 2}
   ammoText: {fileID: 0}
   target: {fileID: 0}
 --- !u!114 &11467876

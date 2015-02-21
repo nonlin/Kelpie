@@ -8,6 +8,8 @@ public class PlayerShooting : MonoBehaviour {
 	public ParticleSystem muzzleFlash;
 	Animator anim;
 	public GameObject impactPrefab;
+	public GameObject bloodSplatPrefab;
+	GameObject currentSplat;
 	private float timeStamp ;
 	//public GameObject bulletHole;
 
@@ -18,6 +20,7 @@ public class PlayerShooting : MonoBehaviour {
 	string enemyName;
 	//For Impact Holes and Impact Effects
 	Queue<GameObject> impacts = new Queue<GameObject>();
+
 	//GameObject[] impacts;
 	NetworkManager NM;
 	int currentImpact = 0;
@@ -80,7 +83,8 @@ public class PlayerShooting : MonoBehaviour {
 			Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
 
 			if(Physics.Raycast(ray, out hit, 50f)){
-				
+				//Get HitRotation on what we hit. 
+				Quaternion hitRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
 				Debug.Log ("<color=red>Tag of Hit Object</color> " + hit.transform.tag + " " + hit.transform.name);
 				if(hit.transform.tag == "Player" && hit.collider.tag != "FlyByRange"){
 
@@ -88,29 +92,29 @@ public class PlayerShooting : MonoBehaviour {
 					gameObject.GetComponent<AudioSource>().Play();
 					//If we hit the head colliderr change the damage
 					if(hit.collider.tag == "Head"){
+
 						Debug.Log ("<color=red>HeadShot!</color> " + hit.collider.name);
 						damage = 100f; 
 					}
 					//If we hit the body change the damage
 					if(hit.collider.tag == "Body"){
+
 						damage = 16f;
 					}
 					Debug.Log ("<color=red>Collider Tag</color> " + hit.collider.tag);
-					
+					Instantiate (bloodSplatPrefab,hit.point, hitRotation);
 					//Tell all we shot a player and call the RPC function GetShot passing damage runs on person shooting
 					hit.transform.GetComponent<PhotonView>().RPC ("GetShot", PhotonTargets.All, damage, PhotonNetwork.player); 
 					Debug.Log ("<color=red>Target Health</color> " + hit.transform.GetComponent<PlayerNetworkMover>().GetHealth());
 				}
 				else{
 					//For objects that are not players 
-					//Get hit roatoin and then push a new gameobject at pos and roatation of the object we hit thanks to ray hit
+					// Push a new gameobject at pos and roatation of the object we hit thanks to ray hit
 					//Dont want to see any decals on the collider for FlyByRange
 					if(hit.collider.tag != "FlyByRange"){
-						Quaternion hitRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+
 						GameObject CurrentImpact = (GameObject)Instantiate (impactPrefab,hit.point, hitRotation);
 						impacts.Enqueue(CurrentImpact);
-						//impacts.Peek().GetComponent<ParticleSystem>().enableEmission = true; 
-						//impacts.Peek().GetComponent<ParticleSystem>().Play();
 						CurrentImpact.GetComponent<ParticleSystem>().Emit(1);
 
 					}
