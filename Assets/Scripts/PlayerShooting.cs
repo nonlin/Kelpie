@@ -19,8 +19,9 @@ public class PlayerShooting : MonoBehaviour {
 	bool showEnemyName = false; 
 	string enemyName;
 	//For Impact Holes and Impact Effects
-	Queue<GameObject> impacts = new Queue<GameObject>();
-
+	static List<GameObject> impacts = new List<GameObject>();
+	List<GameObject>.Enumerator e;
+	GameObject CurrentImpact;
 	//GameObject[] impacts;
 	NetworkManager NM;
 	int currentImpact = 0;
@@ -28,9 +29,11 @@ public class PlayerShooting : MonoBehaviour {
 	bool shooting = false;
 	float damage = 16f; 
 	int clipSize = 30;
+	int clipAmount = 3;
 	bool reloading = false; 
 	public Text ammoText;
 	public Transform target;
+	bool enumDeclared = false;
 	// Use this for initialization
 	void Start () {
 
@@ -41,7 +44,7 @@ public class PlayerShooting : MonoBehaviour {
 		anim = GetComponentInChildren<Animator> ();
 		timeStamp = 0; 
 
-		ammoText.text = clipSize.ToString();
+		ammoText.text = clipAmount.ToString() + "/" +clipSize.ToString();
 	}
 	
 	// Update is called once per frame
@@ -51,7 +54,7 @@ public class PlayerShooting : MonoBehaviour {
 				
 			muzzleFlash.Emit(1);
 			clipSize--;
-			ammoText.text = clipSize.ToString();
+			ammoText.text = clipAmount.ToString() + "/" +clipSize.ToString();
 			anim.SetBool("Fire",true);
 			shooting = true; 
 			timeStamp = Time.time + 0.1f;
@@ -61,7 +64,7 @@ public class PlayerShooting : MonoBehaviour {
 			anim.SetBool("Fire",false);
 		}
 
-		if (Input.GetKeyDown (KeyCode.R) && !Input.GetButton ("Fire1") && clipSize < 30 && !reloading) {
+		if (Input.GetKeyDown (KeyCode.R) && !Input.GetButton ("Fire1") && clipSize < 30 && clipAmount != 0 && !reloading) {
 
 			Debug.Log("Reloading");
 			reloading = true; 
@@ -111,17 +114,33 @@ public class PlayerShooting : MonoBehaviour {
 					//For objects that are not players 
 					// Push a new gameobject at pos and roatation of the object we hit thanks to ray hit
 					//Dont want to see any decals on the collider for FlyByRange
-					if(hit.collider.tag != "FlyByRange"){
+					if(hit.collider.tag != "FlyByRange" && impacts.Count < maxImpacts){
 
-						GameObject CurrentImpact = (GameObject)Instantiate (impactPrefab,hit.point, hitRotation);
-						impacts.Enqueue(CurrentImpact);
+						CurrentImpact = (GameObject)Instantiate (impactPrefab,hit.point, hitRotation);
+						impacts.Add(CurrentImpact);
 						CurrentImpact.GetComponent<ParticleSystem>().Emit(1);
 
 					}
 				}
+				//Just need to set the Enum once after its set, we can't call it again until we are ready to reset again to loop back.
+				if(impacts.Count >= maxImpacts && !enumDeclared){
+					enumDeclared = true;
+					e = impacts.GetEnumerator();
+				}
+				//But now we still need know when to iterate through the list of impacts
 				if(impacts.Count >= maxImpacts){
-					//Once we've pushed to our impact limit destroy the first gameobject we pushed. FIFO thanks to Queues
-					Destroy(impacts.Dequeue());
+
+					if(e.MoveNext()){
+						//This is why we bothered to use enum. Now we don't have to create and destroy, instead we interate through the list
+						//to move the already created impact to a new impact point. 
+						CurrentImpact = e.Current;
+						CurrentImpact.transform.position = hit.point;
+						CurrentImpact.transform.rotation = hitRotation;
+					}
+					else{
+						//Reset
+						e = impacts.GetEnumerator();
+					}
 
 				}
 
@@ -136,7 +155,8 @@ public class PlayerShooting : MonoBehaviour {
 
 		yield return new WaitForSeconds(2.0f);
 		clipSize = 30;
-		ammoText.text = clipSize.ToString();
+		clipAmount--;
+		ammoText.text = clipAmount.ToString() + "/" + clipSize.ToString();
 		reloading = false; 
 	}
 

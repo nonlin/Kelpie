@@ -5315,6 +5315,10 @@ Prefab:
       propertyPath: m_AnchorMax.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 11495312, guid: f1f12b01a444d6349b6bf59d13af7aef, type: 2}
+      propertyPath: m_Text
+      value: Version 0.63.4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f1f12b01a444d6349b6bf59d13af7aef, type: 2}
   m_RootGameObject: {fileID: 1365484598}
@@ -46474,7 +46478,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Version 0.63
+  m_Text: Version 0.63.4
 --- !u!222 &1802017664
 CanvasRenderer:
   m_ObjectHideFlags: 0
