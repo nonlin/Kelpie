@@ -86,6 +86,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
 			NM = GameObject.Find("NetworkManager").GetComponent<NetworkManager>(); 
 			_mouseLook.XSensitivity = PlayerPrefs.GetFloat ("xAxis");
 			_mouseLook.YSensitivity = PlayerPrefs.GetFloat ("yAxis");
+			_mouseLook.smooth = (PlayerPrefs.GetInt("smooth") != 0);
 			//players = GameObject.FindGameObjectsWithTag("Player");
 			// get the transform of the main camera
 			if (Camera.main != null)

@@ -46,6 +46,8 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	Animator anim;
 	Animator animEthan;
 	PhotonView photonView;
+	PlayerShooting playerShooting;
+
 	//ColliderControl colidcon;
 	[SerializeField] bool alive;
 	NetworkManager NM;
@@ -66,6 +68,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		animEthan = transform.Find("char_ethan").GetComponent<Animator> ();
 		injuryAnim = GameObject.FindGameObjectWithTag ("InjuryEffect").GetComponent<Animator>();
 		NM = GameObject.FindGameObjectWithTag ("NetworkManager").GetComponent<NetworkManager>();
+		playerShooting = GetComponentInChildren<PlayerShooting> ();
 		//If its my player, not anothers
 		Debug.Log ("<color=red>Joined Room </color>" + PhotonNetwork.player.name + " " + photonView.isMine);
 		if (photonView.isMine) {
@@ -79,7 +82,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			//enable each script just for the player being spawned and not the others
 			rigidbody.useGravity = true; 
 			GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().enabled = true;
-			GetComponentInChildren<PlayerShooting>().enabled = true;
+			playerShooting.enabled = true;
 			foreach(Camera cam in GetComponentsInChildren<Camera>()){
 				cam.enabled = true; 
 			}
@@ -205,6 +208,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			Debug.Log ("<color=blue>Checking Health</color>" + health + " Photon State " + photonView.isMine + " Player Name " + PhotonNetwork.player.name);
 			if (photonView.isMine) {
 
+				//Only owner can remove themselves
 				Debug.Log ("<color=red>Death</color>");
 				if(SendNetworkMessage != null){
 					SendNetworkMessage(PhotonNetwork.player.name + " got owned by " + enemy.name);
@@ -212,18 +216,12 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 				//Subscribe to the event so that when a player dies 3 sec later respawn
 				if(RespawnMe != null)
 					RespawnMe(3f);
-				//Only owner can remove themselves
+
 				//Create deaths equal to stored hashtable deaths, increment, Set
 				int totalDeaths = (int)PhotonNetwork.player.customProperties["D"];
 				totalDeaths ++;
 				ExitGames.Client.Photon.Hashtable setPlayerDeaths = new ExitGames.Client.Photon.Hashtable() {{"D", totalDeaths}};
 				PhotonNetwork.player.SetCustomProperties(setPlayerDeaths);
-
-				//Destroy Object on network
-				Debug.Log ("<color=green> Collider State After</color>"+transform.GetComponent<Collider>().enabled.ToString());
-				PhotonNetwork.Destroy(gameObject);
-				foreach(PhotonPlayer p in PhotonNetwork.playerList)
-				Debug.Log ("<color=red>PlayerLIst</color>" + p.name);
 
 				//Increment Kill Count for the enemy player
 				int totalKIlls = (int)enemy.customProperties["K"];
@@ -231,6 +229,11 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 				ExitGames.Client.Photon.Hashtable setPlayerKills = new ExitGames.Client.Photon.Hashtable() {{"K", totalKIlls}};
 				Debug.Log ("<color=red>KillCounter Called at </color>" + totalKIlls);
 				enemy.SetCustomProperties(setPlayerKills);
+
+				//Spawn ammo on death
+				PhotonNetwork.Instantiate("Ammo_AK47",transform.position - new Vector3 (0,1,0), Quaternion.Euler(1.5f,149f,95f),0);
+				//Finally destroy the game Object.
+				PhotonNetwork.Destroy(gameObject);
 					
 			}
 		}
@@ -336,5 +339,16 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		RespawnMe -=  NM.StartSpawnProcess;
 		SendNetworkMessage -= NM.AddMessage;
 
+	}
+
+	void OnTriggerEnter(Collider other) {
+		
+		if(other.gameObject.tag == "PickUp"){
+			
+			Debug.Log ("<color=red>Picked Up Ammo</color>");
+			playerShooting.clipAmount++;
+			other.GetComponent<Ammo>().OnPickUp();
+
+		}
 	}
 }

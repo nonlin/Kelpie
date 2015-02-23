@@ -29,7 +29,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xAxis_Text: {fileID: 0}
   yAxis_Text: {fileID: 0}
-  injuryEffect: {fileID: 0}
+  smoothToggle: {fileID: 0}
+  vSync: {fileID: 0}
 --- !u!224 &22498752
 RectTransform:
   m_ObjectHideFlags: 1

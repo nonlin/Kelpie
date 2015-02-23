@@ -29,7 +29,7 @@ public class PlayerShooting : MonoBehaviour {
 	bool shooting = false;
 	float damage = 16f; 
 	int clipSize = 30;
-	int clipAmount = 3;
+	public int clipAmount = 3;
 	bool reloading = false; 
 	public Text ammoText;
 	public Transform target;
@@ -44,11 +44,13 @@ public class PlayerShooting : MonoBehaviour {
 		anim = GetComponentInChildren<Animator> ();
 		timeStamp = 0; 
 
-		ammoText.text = clipAmount.ToString() + "/" +clipSize.ToString();
+
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		//Always update this text
+		ammoText.text = clipAmount.ToString() + "/" +clipSize.ToString();
 
 		if (Input.GetButton ("Fire1") && !Input.GetKey (KeyCode.LeftShift) && timeStamp <= Time.time && clipSize >= 0) {
 				
@@ -80,27 +82,30 @@ public class PlayerShooting : MonoBehaviour {
 			
 			shooting = false; 
 			
-			RaycastHit hit;
+			RaycastHit[] hits;
+			bool flyByTrue = true;
+			hits = Physics.RaycastAll(transform.position, transform.forward, 100.0F);
+			RaycastHit temphit;
 			Debug.Log("Origin: " + transform.position + ", direction: " + transform.forward);
 			Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width*0.5f, Screen.height*0.5f, 0));;
 			Debug.DrawRay(ray.origin, ray.direction * 10, Color.yellow);
-
-			if(Physics.Raycast(ray, out hit, 50f)){
+			foreach(RaycastHit hit in hits){
+			//if(Physics.Raycast(ray, out hit, 50f)){
 				//Get HitRotation on what we hit. 
 				Quaternion hitRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
-				Debug.Log ("<color=red>Tag of Hit Object</color> " + hit.transform.tag + " " + hit.transform.name);
-				if(hit.transform.tag == "Player" && hit.collider.tag != "FlyByRange"){
-
+				Debug.Log ("<color=red>Tag of Hit Object</color> " + hit.transform.tag + " " + hit.transform.name + " " + hits.Length);
+				if(hit.collider.tag == "Body"){
+					flyByTrue = false;
 					//Play hitmarker sound
 					gameObject.GetComponent<AudioSource>().Play();
 					//If we hit the head colliderr change the damage
-					if(hit.collider.tag == "Head"){
+					if(hit.collider.name == "Head"){
 
 						Debug.Log ("<color=red>HeadShot!</color> " + hit.collider.name);
 						damage = 100f; 
 					}
 					//If we hit the body change the damage
-					if(hit.collider.tag == "Body"){
+					if(hit.collider.name == "Torso"){
 
 						damage = 16f;
 					}
@@ -111,6 +116,7 @@ public class PlayerShooting : MonoBehaviour {
 					Debug.Log ("<color=red>Target Health</color> " + hit.transform.GetComponent<PlayerNetworkMover>().GetHealth());
 				}
 				else{
+
 					//For objects that are not players 
 					// Push a new gameobject at pos and roatation of the object we hit thanks to ray hit
 					//Dont want to see any decals on the collider for FlyByRange
@@ -128,7 +134,7 @@ public class PlayerShooting : MonoBehaviour {
 					e = impacts.GetEnumerator();
 				}
 				//But now we still need know when to iterate through the list of impacts
-				if(impacts.Count >= maxImpacts){
+				if(impacts.Count >= maxImpacts && hit.collider.tag != "FlyByRange" && hit.collider.tag != "Body"){
 
 					if(e.MoveNext()){
 						//This is why we bothered to use enum. Now we don't have to create and destroy, instead we interate through the list
@@ -143,11 +149,15 @@ public class PlayerShooting : MonoBehaviour {
 					}
 
 				}
+				temphit = hit;
+	
 
-				if(hit.collider.tag == "FlyByRange"){
-					hit.transform.GetComponent<PhotonView>().RPC ("PlayFlyByShots", PhotonTargets.Others); 
-				}
 			}
+			if(temphit.collider.tag == "FlyByRange" && flyByTrue){
+				Debug.Log ("<color=green>FlyRange Sound</color>");
+				temphit.transform.GetComponent<PhotonView>().RPC ("PlayFlyByShots", PhotonTargets.Others); 
+			}
+		//}
 		}
 	}
 	
@@ -184,5 +194,7 @@ public class PlayerShooting : MonoBehaviour {
 		if(showEnemyName)
 			guiMan.EnemyName (enemyTransform, enemyName);
 	}
+
+
 	
 }
