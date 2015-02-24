@@ -312,7 +312,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	[RPC]
 	public void PlayFlyByShots(){
 
-		audio2.clip = flyByShots [Random.Range (0, 12)];
+		audio2.clip = flyByShots [Random.Range (0, 8)];
 		audio2.Play ();
 	}
 

@@ -3396,7 +3396,7 @@ MonoBehaviour:
     MaximumY: 90
     smooth: 0
     smoothtime: 0
-  useFOVKick: 1
+  useFOVKick: 0
   _fovKick:
     Camera: {fileID: 0}
     OriginalFOV: 0
@@ -3418,7 +3418,7 @@ MonoBehaviour:
         tangentMode: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
-  useHeadBob: 1
+  useHeadBob: 0
   _headBob:
     HorizontalBobRange: .100000001
     VerticalBobRange: .100000001
