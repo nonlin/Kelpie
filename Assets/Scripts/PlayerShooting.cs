@@ -119,10 +119,11 @@ public class PlayerShooting: MonoBehaviour {
 						damage = 16f;
 					}
 
-					if(decalHitCount >= 1){
+					if(decalHitCount >= 1 && hits[i].collider.name != "Head"){
 
 						damage = 10f;
 					}
+
 					Debug.Log("<color=red>Collider Tag</color> " + hits[i].collider.tag);
 					Instantiate(bloodSplatPrefab, hits[i].point, hitRotation);
 					//Tell all we shot a player and call the RPC function GetShot passing damage runs on person shooting
@@ -131,7 +132,7 @@ public class PlayerShooting: MonoBehaviour {
 				}
 
 				//Every time we add a decal add to the count, once count limit is reach we won't place any more decals
-				if(decalHitCount <= 2){
+				if(decalHitCount <= 1){
 					//Initial creation of bullet decals, once max limit of decals are made we have our pool
 					//We only make them when it hasn't hit a player body part or the FlyRange Collider
 					if (hits[i].collider.tag != "FlyByRange" && hits[i].collider.tag != "Body" && impacts.Count < maxImpacts) {
