@@ -61,7 +61,8 @@ namespace UnitySampleAssets.Characters.FirstPerson
 		private Vector3 camForward; // The current forward direction of the camera
 		private Vector3 move;
 		private Transform cam; // A reference to the main camera in the scenes transform
-		
+		float mouseTempX;
+		float mouseTempY; 
 		void Awake(){
 
 			guiMan = GameObject.Find ("NetworkManager").GetComponent<GUIManager> ();
@@ -87,6 +88,8 @@ namespace UnitySampleAssets.Characters.FirstPerson
 			_mouseLook.XSensitivity = PlayerPrefs.GetFloat ("xAxis");
 			_mouseLook.YSensitivity = PlayerPrefs.GetFloat ("yAxis");
 			_mouseLook.smooth = (PlayerPrefs.GetInt("smooth") != 0);
+			mouseTempX = _mouseLook.XSensitivity;
+			mouseTempY = _mouseLook.YSensitivity;
 			//players = GameObject.FindGameObjectsWithTag("Player");
 			// get the transform of the main camera
 			if (Camera.main != null)
@@ -217,7 +220,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
             // Read input
             float horizontal = CrossPlatformInputManager.GetAxis("Horizontal");
             float vertical = CrossPlatformInputManager.GetAxis("Vertical");
-
+			bool doOnce = false;
 			bool waswalking = _isWalking;
 
 #if !MOBILE_INPUT
@@ -226,8 +229,19 @@ namespace UnitySampleAssets.Characters.FirstPerson
             _isWalking = !Input.GetKey(KeyCode.LeftShift) || stamina <= 0;
 			bool aim = Input.GetButton("Fire2");
 			
-			if(aim){
+			if(aim && !doOnce){
 				_isWalking = true; 
+				doOnce = true;
+				_mouseLook.XSensitivity = mouseTempX - (mouseTempX * 0.45f);//Probalby have to store it in a temp to do a perecent reduction
+				_mouseLook.YSensitivity = mouseTempY - (mouseTempY  * 0.45f);
+
+				Debug.Log (_mouseLook.YSensitivity);
+				
+			}
+			if(!aim){
+				doOnce = false;
+				_mouseLook.XSensitivity = PlayerPrefs.GetFloat ("xAxis");
+				_mouseLook.YSensitivity = PlayerPrefs.GetFloat ("yAxis");
 			}
 
 			AnimationLogic(vertical, horizontal);
