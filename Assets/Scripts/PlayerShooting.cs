@@ -70,6 +70,7 @@ public class PlayerShooting: MonoBehaviour {
 			
 			Debug.Log("Reloading");
 			reloading = true;
+			anim.SetBool("Reloading", true);
 			NM.player.GetComponent < PhotonView > ().RPC("ReloadingSound", PhotonTargets.All);
 			StartCoroutine(Reload());
 		}
@@ -194,6 +195,8 @@ public class PlayerShooting: MonoBehaviour {
 		clipAmount--;
 		ammoText.text = clipAmount.ToString() + "/" + clipSize.ToString();
 		reloading = false;
+		anim.SetBool("Reloading", false);
+
 	}
 	
 	IEnumerator EmptyGun() {

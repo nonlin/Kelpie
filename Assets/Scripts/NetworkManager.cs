@@ -154,7 +154,7 @@ public class NetworkManager : MonoBehaviour {
 		//Show Lobby cam on death vs blank screen
 		sceneCamera.enabled = true; 
 		StartCoroutine ("SpawnPlayer", respawnTime);
-		AddMessage ("Player " + PhotonNetwork.player.name + " has spawned.");
+
 		//Enable Lobby Sound
 		GameObject.FindGameObjectWithTag ("LobbyCam").GetComponent<AudioListener> ().enabled = true;
 		 
@@ -178,7 +178,7 @@ public class NetworkManager : MonoBehaviour {
 		player.GetComponent<PlayerNetworkMover> ().SendNetworkMessage += AddMessage;//"Subscribe" to it
 
 		sceneCamera.enabled = false;
-		AddMessage ("Spawned Player: " + PhotonNetwork.player.name);
+		AddMessage ("Player " + PhotonNetwork.player.name + " has spawned.");
 		//Add player that just spawned to player list. 
 	
 	}

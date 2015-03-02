@@ -211,7 +211,11 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 				//Only owner can remove themselves
 				Debug.Log ("<color=red>Death</color>");
 				if(SendNetworkMessage != null){
-					SendNetworkMessage(PhotonNetwork.player.name + " got owned by " + enemy.name);
+					if(damage < 100f)
+						SendNetworkMessage(enemy.name + " owned " + PhotonNetwork.player.name + ".");
+					if(damage == 100f)
+						SendNetworkMessage(enemy.name + " headshot " + PhotonNetwork.player.name + "!");
+						
 				}
 				//Subscribe to the event so that when a player dies 3 sec later respawn
 				if(RespawnMe != null)
@@ -344,11 +348,12 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	void OnTriggerEnter(Collider other) {
 		
 		if(other.gameObject.tag == "PickUp"){
-			
-			Debug.Log ("<color=red>Picked Up Ammo</color>");
-			playerShooting.clipAmount++;
-			other.GetComponent<Ammo>().OnPickUp();
 
+			if(other.GetComponent<Ammo>().canGet){
+				Debug.Log ("<color=red>Picked Up Ammo</color>");
+				playerShooting.clipAmount++;
+				other.GetComponent<Ammo>().OnPickUp();
+			}
 		}
 	}
 }
