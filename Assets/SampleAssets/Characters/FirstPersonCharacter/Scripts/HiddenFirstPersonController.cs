@@ -9,7 +9,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
 {
     //[RequireComponent(typeof (CharacterController))]
     [RequireComponent(typeof (AudioSource))]
-    public class FirstPersonController : MonoBehaviour
+    public class HiddenFirstPersonController : MonoBehaviour
     {
 
         //////////////////////// exposed privates ///////////////////////
@@ -245,11 +245,11 @@ namespace UnitySampleAssets.Characters.FirstPerson
 			}
 
 			AnimationLogic(vertical, horizontal);
-			if(gameObject.name == "FPSPlayer(Clone)"){
-				//Weapon Animations
-				anim.SetBool("Sprint", !_isWalking);
-				anim.SetBool ("Aim", aim);
-			}
+
+			//Weapon Animations
+			//anim.SetBool("Sprint", !_isWalking);
+			//anim.SetBool ("Aim", aim);
+
 			//Drain Stamina
 			if(!_isWalking && _characterController.velocity.x > 1){
 				stamina = stamina-0.9f;

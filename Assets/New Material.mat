@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: char_cyberKid_board_mat
-  m_Shader: {fileID: 2, guid: 0000000000000000f000000000000000, type: 0}
+  m_Name: New Material
+  m_Shader: {fileID: 4800000, guid: 9dccc06eb13244068bc6ac575ff2ec98, type: 3}
   m_ShaderKeywords: []
   m_CustomRenderQueue: -1
   m_SavedProperties:
@@ -17,28 +17,40 @@ Material:
         first:
           name: _MainTex
         second:
-          m_Texture: {fileID: 2800000, guid: 932fa490583c717418ff2f28d14fb85d, type: 3}
-          m_Scale: {x: 1, y: 1}
+          m_Texture: {fileID: 2800000, guid: 19555d7d9d114c7f1100f5ab44295342, type: 3}
+          m_Scale: {x: 5, y: 2}
           m_Offset: {x: 0, y: 0}
       data:
         first:
           name: _BumpMap
         second:
-          m_Texture: {fileID: 2800000, guid: 9624199be3b1f1344aab0a07afc8e5d7, type: 3}
+          m_Texture: {fileID: 2800000, guid: dab0806454e4d924491b1b84dddaa6b7, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _Cube
+          name: _NoiseTex
         second:
-          m_Texture: {fileID: 8900000, guid: fa43e2bcb8953814d8a89e83a2a7a867, type: 2}
+          m_Texture: {fileID: 2800000, guid: 70ad4d8ed44c942dd817dbed55a83954, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
     m_Floats:
       data:
         first:
           name: _Shininess
-        second: .115712106
+        second: .198656723
+      data:
+        first:
+          name: strength
+        second: .194029853
+      data:
+        first:
+          name: transparency
+        second: .0500000007
+      data:
+        first:
+          name: _DistAmt
+        second: 43.9403
     m_Colors:
       data:
         first:
@@ -47,8 +59,7 @@ Material:
       data:
         first:
           name: _SpecColor
-        second: {r: .880596995, g: .880596995, b: .880596995, a: 1}
-      data:
-        first:
-          name: _ReflectColor
-        second: {r: .45104897, g: .45104897, b: .45104897, a: .501960814}
+        second: {r: .5, g: .5, b: .5, a: 1}
+--- !u!1002 &2100001
+EditorExtensionImpl:
+  serializedVersion: 6

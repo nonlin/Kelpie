@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using System.Linq;
 
-public class PlayerShooting: MonoBehaviour {
+public class HiddenShooting: MonoBehaviour {
 	
 	public ParticleSystem muzzleFlash;
 	Animator anim;
@@ -54,38 +54,24 @@ public class PlayerShooting: MonoBehaviour {
 		ammoText.text = clipAmount.ToString() + "/" + clipSize.ToString();
 		
 		if (Input.GetButton("Fire1") && !Input.GetKey(KeyCode.LeftShift) && timeStamp <= Time.time && clipSize > 0) {
-
+			
+			//muzzleFlash.Emit(1);
+			clipSize--;
+			ammoText.text = clipAmount.ToString() + "/" + clipSize.ToString();
+			anim.SetBool("KnifeAttack", true);
 			shooting = true;
-
-			if(gameObject.transform.parent.gameObject.transform.parent.gameObject.name == "FPSPlayer(Clone)"){
-
-				muzzleFlash.Emit(1);
-				anim.SetBool("Fire", true);
-				timeStamp = Time.time + 0.1f;
-				clipSize--;
-				ammoText.text = clipAmount.ToString() + "/" + clipSize.ToString();
-			}
-			else{
-				anim.SetBool("KnifeAttack",true);
-				timeStamp = Time.time + 0.5f;
-				
-			}
-			NM.player.GetComponent < PhotonView > ().RPC("ShootingSound", PhotonTargets.All, true);
-		} 
-		else {
-
-			if(gameObject.transform.parent.gameObject.transform.parent.gameObject.name == "FPSPlayer(Clone)")
-				anim.SetBool("Fire", false);
-			else
-				anim.SetBool("KnifeAttack",false);
+			timeStamp = Time.time + 0.5f;
+			//NM.player.GetComponent < PhotonView > ().RPC("ShootingSound", PhotonTargets.All, true);
+		} else {
+			anim.SetBool("KnifeAttack", false);
 		}
 		
 		if (Input.GetKeyDown(KeyCode.R) && !Input.GetButton("Fire1") && clipSize < 30 && clipAmount != 0 && !reloading) {
 			
 			Debug.Log("Reloading");
 			reloading = true;
-			anim.SetBool("Reloading", true);
-			NM.player.GetComponent < PhotonView > ().RPC("ReloadingSound", PhotonTargets.All);
+			//anim.SetBool("Reloading", true);
+			//NM.player.GetComponent < PhotonView > ().RPC("ReloadingSound", PhotonTargets.All);
 			StartCoroutine(Reload());
 		}
 		if (clipSize <= 0 && Input.GetButtonDown("Fire1")) {
@@ -93,113 +79,8 @@ public class PlayerShooting: MonoBehaviour {
 			NM.player.GetComponent < PhotonView > ().RPC("OutOfAmmo", PhotonTargets.All);
 		}
 		Debug.DrawRay(transform.position, transform.forward * 10, Color.red);
-		if (shooting && gameObject.transform.parent.gameObject.transform.parent.gameObject.name == "FPSPlayer(Clone)") {
+		if (shooting) {
 			
-			shooting = false;
-			
-			RaycastHit[] hits;
-			bool flyByTrue = true;
-			int decalHitCount = 0;//to know how many walls we've hit limit bullet decal spray
-			hits = RaycastAllNonConvex(transform.position, transform.forward);
-			// Physics.RaycastAll(transform.position, transform.forward);//.OrderBy(h=>h.distance).ToArray();
-			
-			RaycastHit temphit;
-			Debug.Log("Origin: " + transform.position + ", direction: " + transform.forward);
-			Debug.DrawRay(transform.position, transform.forward * 10, Color.red);
-			
-			foreach(RaycastHit hit in hits) {
-				
-				Debug.Log("<color=blue>Hit Order: </color>" + hit.collider.name + " " + hit.distance);
-			}
-			
-			for (int i = 0; i < hits.Length; i++) {
-
-				if(hits != null){
-
-					Quaternion hitRotation = Quaternion.FromToRotation(Vector3.up, hits[i].normal);
-					Debug.Log("<color=red>Tag of Hit Object</color> " + hits[i].transform.tag + " " + hits[i].transform.name + " " + hits.Length);
-					//If they hit the FlyByRange first or second then we know we can check to see if they hit the player
-					if (i == 1 || i == 2 && (hits[0].collider.tag == "FlyByRange" || hits[1].collider.tag == "FlyByRange")) if (hits[i].collider.tag == "Body") {
-						flyByTrue = false;
-						//Play hitmarker sound
-						gameObject.GetComponent < AudioSource > ().Play();
-
-						//If we hit the head colliderr change the damage
-						if (hits[i].collider.name == "Head") {
-							
-							Debug.Log("<color=red>HeadShot!</color> " + hits[i].collider.name);
-							damage = 100f;
-						}
-						//If we hit the body change the damage
-						if (hits[i].collider.name == "Torso") {
-							
-							damage = 16f;
-						}
-
-						if(decalHitCount >= 1 && hits[i].collider.name != "Head"){
-
-							damage = 10f;
-						}
-
-						Debug.Log("<color=red>Collider Tag</color> " + hits[i].collider.tag);
-						Instantiate(bloodSplatPrefab, hits[i].point, hitRotation);
-						//Tell all we shot a player and call the RPC function GetShot passing damage runs on person shooting
-						hits[i].transform.GetComponent < PhotonView > ().RPC("GetShot", PhotonTargets.All, damage, PhotonNetwork.player);
-						Debug.Log("<color=red>Target Health</color> " + hits[i].transform.GetComponent < PlayerNetworkMover > ().GetHealth());
-					}
-
-					//Every time we add a decal add to the count, once count limit is reach we won't place any more decals
-					if(decalHitCount <= 1){
-						//Initial creation of bullet decals, once max limit of decals are made we have our pool
-						//We only make them when it hasn't hit a player body part or the FlyRange Collider
-						if (hits[i].collider.tag != "FlyByRange" && hits[i].collider.tag != "Body" && impacts.Count < maxImpacts) {
-				
-							CurrentImpact = (GameObject) Instantiate(impactPrefab, hits[i].point, hitRotation);
-							impacts.Add(CurrentImpact);
-							CurrentImpact.GetComponent < ParticleSystem > ().Emit(1);
-							decalHitCount++;
-						}
-						
-						//Just need to set the Enum once after its set, we can't call it again until we are ready to reset again to loop back.
-						if (impacts.Count >= maxImpacts && !enumDeclared) {
-							enumDeclared = true;
-							e = impacts.GetEnumerator();
-						}
-						//But now we still need know when to iterate through the list of impacts
-						if (impacts.Count >= maxImpacts && hits[i].collider.tag != "FlyByRange" && hits[i].collider.tag != "Body") {
-							
-							decalHitCount++;
-							if (e.MoveNext()) {
-								//This is why we bothered to use enum. Now we don't have to create and destroy, instead we interate through the list
-								//to move the already created impact to a new impact point. 
-								CurrentImpact = e.Current;
-								CurrentImpact.transform.position = hits[i].point;
-								CurrentImpact.transform.rotation = hitRotation;
-							} else {
-								//Reset
-								e = impacts.GetEnumerator();
-							}
-							
-						}
-					}
-					//If fly by range is the first hit or second hit we shall play the sound(second hit implies hit through wall)
-					if (hits[0].collider.tag == "FlyByRange" && flyByTrue) {
-						//if(temphit.collider.tag == "FlyByRange" ){
-						Debug.Log("<color=green>FlyRange Sound</color>");
-						hits[0].transform.GetComponent < PhotonView > ().RPC("PlayFlyByShots", PhotonTargets.Others);
-					}
-					//Second Hit on FlyByRange
-					if(hits.Length > 1){//If there is more than 1 element in hits we can check at location 1
-						if (hits[1].collider.tag == "FlyByRange" && flyByTrue) {
-							//if(temphit.collider.tag == "FlyByRange" ){
-							Debug.Log("<color=green>FlyRange Sound</color>");
-							hits[1].transform.GetComponent < PhotonView > ().RPC("PlayFlyByShots", PhotonTargets.Others);
-						}
-					}
-				}
-			}
-		}
-		else if(shooting){
 			shooting = false;
 			
 			RaycastHit[] hits;
@@ -218,9 +99,9 @@ public class PlayerShooting: MonoBehaviour {
 			}
 			
 			for (int i = 0; i < hits.Length; i++) {
-				
+
 				if(hits != null){
-					
+
 					Quaternion hitRotation = Quaternion.FromToRotation(Vector3.up, hits[i].normal);
 					Debug.Log("<color=red>Tag of Hit Object</color> " + hits[i].transform.tag + " " + hits[i].transform.name + " " + hits.Length);
 					//If they hit the FlyByRange first or second then we know we can check to see if they hit the player
@@ -228,7 +109,7 @@ public class PlayerShooting: MonoBehaviour {
 						flyByTrue = false;
 						//Play hitmarker sound
 						gameObject.GetComponent < AudioSource > ().Play();
-						
+
 						//If we hit the head colliderr change the damage
 						if (hits[i].collider.name == "Head") {
 							
@@ -240,25 +121,25 @@ public class PlayerShooting: MonoBehaviour {
 							
 							damage = 16f;
 						}
-						
+
 						if(decalHitCount >= 1 && hits[i].collider.name != "Head"){
-							
+
 							damage = 10f;
 						}
-						
+
 						Debug.Log("<color=red>Collider Tag</color> " + hits[i].collider.tag);
 						Instantiate(bloodSplatPrefab, hits[i].point, hitRotation);
 						//Tell all we shot a player and call the RPC function GetShot passing damage runs on person shooting
 						hits[i].transform.GetComponent < PhotonView > ().RPC("GetShot", PhotonTargets.All, damage, PhotonNetwork.player);
 						Debug.Log("<color=red>Target Health</color> " + hits[i].transform.GetComponent < PlayerNetworkMover > ().GetHealth());
 					}
-					
+
 					//Every time we add a decal add to the count, once count limit is reach we won't place any more decals
 					if(decalHitCount <= 1){
 						//Initial creation of bullet decals, once max limit of decals are made we have our pool
 						//We only make them when it hasn't hit a player body part or the FlyRange Collider
 						if (hits[i].collider.tag != "FlyByRange" && hits[i].collider.tag != "Body" && impacts.Count < maxImpacts) {
-							
+				
 							CurrentImpact = (GameObject) Instantiate(impactPrefab, hits[i].point, hitRotation);
 							impacts.Add(CurrentImpact);
 							CurrentImpact.GetComponent < ParticleSystem > ().Emit(1);
@@ -314,7 +195,7 @@ public class PlayerShooting: MonoBehaviour {
 		clipAmount--;
 		ammoText.text = clipAmount.ToString() + "/" + clipSize.ToString();
 		reloading = false;
-		anim.SetBool("Reloading", false);
+		//anim.SetBool("Reloading", false);
 
 	}
 	
