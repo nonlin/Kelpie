@@ -5,7 +5,7 @@ public class guiTextSet : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	 guiText.text= 	"\nArrow Keys: Move\nLeft Shift: Sneak\nZ: Use Switch\nX: Attract Attention";
+	 GetComponent<GUIText>().text= 	"\nArrow Keys: Move\nLeft Shift: Sneak\nZ: Use Switch\nX: Attract Attention";
 	
 	}
 

@@ -243,7 +243,7 @@ namespace UnitySampleAssets.Characters.FirstPerson
 				_mouseLook.XSensitivity = PlayerPrefs.GetFloat ("xAxis");
 				_mouseLook.YSensitivity = PlayerPrefs.GetFloat ("yAxis");
 			}
-
+			//
 			AnimationLogic(vertical, horizontal);
 
 			//Weapon Animations

@@ -13,7 +13,7 @@ public class PlayerShooting: MonoBehaviour {
 	public GameObject bloodSplatPrefab;
 	GameObject currentSplat;
 	private float timeStamp;
-	List < RaycastAllSort > raycastSort = new List < RaycastAllSort > ();
+//	List < RaycastAllSort > raycastSort = new List < RaycastAllSort > ();
 	//To show name when looked at
 	GUIManager guiMan;
 	Transform enemyTransform;
@@ -88,8 +88,7 @@ public class PlayerShooting: MonoBehaviour {
 			int decalHitCount = 0;//to know how many walls we've hit limit bullet decal spray
 			hits = RaycastAllNonConvex(transform.position, transform.forward);
 			// Physics.RaycastAll(transform.position, transform.forward);//.OrderBy(h=>h.distance).ToArray();
-			
-			RaycastHit temphit;
+		
 			Debug.Log("Origin: " + transform.position + ", direction: " + transform.forward);
 			Debug.DrawRay(transform.position, transform.forward * 10, Color.red);
 			

@@ -18,7 +18,7 @@ namespace UnitySampleAssets.SceneUtils
 
         private void Start()
         {
-            area = (collider as BoxCollider).bounds;
+            area = (GetComponent<Collider>() as BoxCollider).bounds;
             StartCoroutine(GenerateClouds());
         }
 

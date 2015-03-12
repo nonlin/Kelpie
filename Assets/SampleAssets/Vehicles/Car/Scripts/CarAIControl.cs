@@ -67,9 +67,9 @@ namespace UnitySampleAssets.Vehicles.Car
             else
             {
                 Vector3 fwd = transform.forward;
-                if (rigidbody.velocity.magnitude > carController.MaxSpeed*0.1f)
+                if (GetComponent<Rigidbody>().velocity.magnitude > carController.MaxSpeed*0.1f)
                 {
-                    fwd = rigidbody.velocity;
+                    fwd = GetComponent<Rigidbody>().velocity;
                 }
 
                 float desiredSpeed = carController.MaxSpeed;
@@ -86,7 +86,7 @@ namespace UnitySampleAssets.Vehicles.Car
                             float approachingCornerAngle = Vector3.Angle(target.forward, fwd);
 
                             // also consider the current amount we're turning, multiplied up and then compared in the same way as an upcoming corner angle
-                            float spinningAngle = rigidbody.angularVelocity.magnitude*cautiousAngularVelocityFactor;
+                            float spinningAngle = GetComponent<Rigidbody>().angularVelocity.magnitude*cautiousAngularVelocityFactor;
 
                             // if it's different to our current angle, we need to be cautious (i.e. slow down) a certain amount
                             float cautiousnessRequired = Mathf.InverseLerp(0, cautiousMaxAngle,
@@ -107,7 +107,7 @@ namespace UnitySampleAssets.Vehicles.Car
                             float distanceCautiousFactor = Mathf.InverseLerp(cautiousMaxDistance, 0, delta.magnitude);
 
                             // also consider the current amount we're turning, multiplied up and then compared in the same way as an upcoming corner angle
-                            float spinningAngle = rigidbody.angularVelocity.magnitude*cautiousAngularVelocityFactor;
+                            float spinningAngle = GetComponent<Rigidbody>().angularVelocity.magnitude*cautiousAngularVelocityFactor;
 
                             // if it's different to our current angle, we need to be cautious (i.e. slow down) a certain amount
                             float cautiousnessRequired = Mathf.Max(

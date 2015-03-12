@@ -74,7 +74,7 @@ public class DonePlayerHealth : MonoBehaviour
 		lastPlayerSighting.position = lastPlayerSighting.resetPosition;
 		
 		// Stop the footsteps playing.
-		audio.Stop();
+		GetComponent<AudioSource>().Stop();
 	}
 	
 	

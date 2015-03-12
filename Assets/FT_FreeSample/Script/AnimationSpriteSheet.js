@@ -18,7 +18,7 @@ function Update () {
 	var vIndex = index / uvX;
  	var offset = Vector2 (uIndex * size.x, 1.0 - size.y - vIndex * size.y);
  
-	renderer.material.SetTextureOffset ("_MainTex", offset);
-	renderer.material.SetTextureScale ("_MainTex", size);
+	GetComponent.<Renderer>().material.SetTextureOffset ("_MainTex", offset);
+	GetComponent.<Renderer>().material.SetTextureScale ("_MainTex", size);
 }
 

@@ -18,7 +18,7 @@ public class DoneLaserPlayerDetection : MonoBehaviour
     void OnTriggerStay(Collider other)
     {
 		// If the beam is on...
-        if(renderer.enabled)
+        if(GetComponent<Renderer>().enabled)
 			// ... and if the colliding gameobject is the player...
             if(other.gameObject == player)
 				// ... set the last global sighting of the player to the colliding object's position.
