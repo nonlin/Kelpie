@@ -73,10 +73,10 @@ public class DonePlayerMovement : MonoBehaviour
 		Quaternion targetRotation = Quaternion.LookRotation(targetDirection, Vector3.up);
 		
 		// Create a rotation that is an increment closer to the target rotation from the player's rotation.
-		Quaternion newRotation = Quaternion.Lerp(rigidbody.rotation, targetRotation, turnSmoothing * Time.deltaTime);
+		Quaternion newRotation = Quaternion.Lerp(GetComponent<Rigidbody>().rotation, targetRotation, turnSmoothing * Time.deltaTime);
 		
 		// Change the players rotation to this new rotation.
-		rigidbody.MoveRotation(newRotation);
+		GetComponent<Rigidbody>().MoveRotation(newRotation);
 	}
 	
 	
@@ -86,13 +86,13 @@ public class DonePlayerMovement : MonoBehaviour
 		if(anim.GetCurrentAnimatorStateInfo(0).nameHash == hash.locomotionState)
 		{
 			// ... and if the footsteps are not playing...
-			if(!audio.isPlaying)
+			if(!GetComponent<AudioSource>().isPlaying)
 				// ... play them.
-				audio.Play();
+				GetComponent<AudioSource>().Play();
 		}
 		else
 			// Otherwise stop the footsteps.
-			audio.Stop();
+			GetComponent<AudioSource>().Stop();
 		
 		// If the shout input has been pressed...
 		if(shout)

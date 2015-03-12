@@ -16,12 +16,12 @@ public class DoneLaserBlinking : MonoBehaviour
         timer += Time.deltaTime;
 		
 		// If the beam is on and the onTime has been reached...
-        if(renderer.enabled && timer >= onTime)
+        if(GetComponent<Renderer>().enabled && timer >= onTime)
 			// Switch the beam.
             SwitchBeam();
 		
 		// If the beam is off and the offTime has been reached...
-        if(!renderer.enabled && timer >= offTime)
+        if(!GetComponent<Renderer>().enabled && timer >= offTime)
 			// Switch the beam.
             SwitchBeam();
 	}
@@ -33,7 +33,7 @@ public class DoneLaserBlinking : MonoBehaviour
 		timer = 0f;
 		
 		// Switch whether the beam and light are on or off.
-	    renderer.enabled = !renderer.enabled;
-		light.enabled = !light.enabled;
+	    GetComponent<Renderer>().enabled = !GetComponent<Renderer>().enabled;
+		GetComponent<Light>().enabled = !GetComponent<Light>().enabled;
 	}
 }

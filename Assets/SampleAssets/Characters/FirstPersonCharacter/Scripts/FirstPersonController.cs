@@ -243,13 +243,13 @@ namespace UnitySampleAssets.Characters.FirstPerson
 				_mouseLook.XSensitivity = PlayerPrefs.GetFloat ("xAxis");
 				_mouseLook.YSensitivity = PlayerPrefs.GetFloat ("yAxis");
 			}
-
+			//
 			AnimationLogic(vertical, horizontal);
-			if(gameObject.name == "FPSPlayer(Clone)"){
-				//Weapon Animations
-				anim.SetBool("Sprint", !_isWalking);
-				anim.SetBool ("Aim", aim);
-			}
+
+			//Weapon Animations
+			anim.SetBool("Sprint", !_isWalking);
+			anim.SetBool ("Aim", aim);
+
 			//Drain Stamina
 			if(!_isWalking && _characterController.velocity.x > 1){
 				stamina = stamina-0.9f;

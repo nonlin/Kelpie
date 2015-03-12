@@ -15,6 +15,6 @@ public class ColliderControl : MonoBehaviour {
 
 	public void DisableCollider(){
 
-		gameObject.collider.enabled = false; 
+		gameObject.GetComponent<Collider>().enabled = false; 
 	}
 }

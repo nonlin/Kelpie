@@ -80,7 +80,7 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	
 			playerName = PhotonNetwork.player.name;
 			//enable each script just for the player being spawned and not the others
-			rigidbody.useGravity = true; 
+			GetComponent<Rigidbody>().useGravity = true; 
 			GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().enabled = true;
 			playerShooting.enabled = true;
 			foreach(Camera cam in GetComponentsInChildren<Camera>()){
@@ -113,12 +113,6 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 			}
 			//If player is ours have CC ignore body parts
 			Physics.IgnoreLayerCollision(0,12, true);
-
-			/*bodys = GameObject.FindGameObjectsWithTag("Body");
-			for(int i = 0; i < bodys.Length; i++){
-				if(bodys[i].GetComponentInParent<PlayerNetworkMover>().gameObject.GetInstanceID() == gameObject.GetInstanceID() )
-					bodys[i].layer = 11; 
-			}*/
 
 		}
 		else{
@@ -285,8 +279,8 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	[RPC]
 	public void PlayLandingSound()
 	{
-		audio.clip = _landSound;
-		audio.Play();
+		GetComponent<AudioSource>().clip = _landSound;
+		GetComponent<AudioSource>().Play();
 		_nextStep = _stepCycle + .5f;
 		
 	}
@@ -294,8 +288,8 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 	[RPC]
 	public void PlayJumpSound()
 	{
-		audio.clip = _jumpSound;
-		audio.Play();
+		GetComponent<AudioSource>().clip = _jumpSound;
+		GetComponent<AudioSource>().Play();
 	}
 
 	
@@ -306,11 +300,11 @@ public class PlayerNetworkMover : Photon.MonoBehaviour {
 		// pick & play a random footstep sound from the array,
 		// excluding sound at index 0
 		int n = Random.Range(1, _footstepSounds.Length);
-		audio.clip = _footstepSounds[n];
-		audio.PlayOneShot(audio.clip);
+		GetComponent<AudioSource>().clip = _footstepSounds[n];
+		GetComponent<AudioSource>().PlayOneShot(GetComponent<AudioSource>().clip);
 		// move picked sound to index 0 so it's not picked next time
 		_footstepSounds[n] = _footstepSounds[0];
-		_footstepSounds[0] = audio.clip;
+		_footstepSounds[0] = GetComponent<AudioSource>().clip;
 	}
 
 	[RPC]

@@ -37,12 +37,12 @@ namespace UnitySampleAssets.Vehicles.Aeroplane
         private void Update()
         {
 
-            if (state == GearState.Lowered && plane.Altitude > raiseAtAltitude && rigidbody.velocity.y > 0)
+            if (state == GearState.Lowered && plane.Altitude > raiseAtAltitude && GetComponent<Rigidbody>().velocity.y > 0)
             {
                 state = GearState.Raised;
             }
 
-            if (state == GearState.Raised && plane.Altitude < lowerAtAltitude && rigidbody.velocity.y < 0)
+            if (state == GearState.Raised && plane.Altitude < lowerAtAltitude && GetComponent<Rigidbody>().velocity.y < 0)
             {
                 state = GearState.Lowered;
             }

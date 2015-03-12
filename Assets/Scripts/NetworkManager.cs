@@ -51,7 +51,7 @@ public class NetworkManager : MonoBehaviour {
 		//Game Managing Stuff
 		ammoText.SetActive (false);
 		pausePanel.SetActive(false);
-		Screen.lockCursor = false;
+		Cursor.lockState = CursorLockMode.None;
 		versionText.SetActive (true);
 		optionsMenu.SetActive (false);
 		GameObject.FindGameObjectWithTag ("LobbyCam").GetComponent<AudioListener> ().enabled = true;
@@ -67,8 +67,8 @@ public class NetworkManager : MonoBehaviour {
 					if(!paused){
 
 					//Time.timeScale = 0;
-					Screen.lockCursor = false;
-					Screen.showCursor = true;
+					Cursor.lockState = CursorLockMode.None;
+					Cursor.visible = true;
 					//Disable Shooting and movement
 					player.GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().enabled = false;
 					player.GetComponentInChildren<PlayerShooting>().enabled = false;
@@ -79,8 +79,8 @@ public class NetworkManager : MonoBehaviour {
 				else{
 
 					//Time.timeScale = 1;
-					Screen.lockCursor = true;
-					Screen.showCursor = false;
+					Cursor.lockState = CursorLockMode.Locked;
+					Cursor.visible = false;
 					//Re-Enable
 					player.GetComponent<UnitySampleAssets.Characters.FirstPerson.FirstPersonController>().enabled = true;
 					player.GetComponentInChildren<PlayerShooting>().enabled = true;
@@ -157,15 +157,14 @@ public class NetworkManager : MonoBehaviour {
 
 		//Enable Lobby Sound
 		GameObject.FindGameObjectWithTag ("LobbyCam").GetComponent<AudioListener> ().enabled = true;
-		 
 
 	}
 
 	IEnumerator SpawnPlayer(float respawnTime){
 
 		yield return new WaitForSeconds(respawnTime);
-		Screen.showCursor = false;
-		Screen.lockCursor = true;
+		Cursor.visible = false;
+		Cursor.lockState = CursorLockMode.Locked;
 		//Turn Lobby Listner off again
 		GameObject.FindGameObjectWithTag ("LobbyCam").GetComponent<AudioListener> ().enabled = false;
 		//Debug.Log ("<color=red>Joined Room </color>" + PhotonNetwork.player.name + " " + photonView.isMine);

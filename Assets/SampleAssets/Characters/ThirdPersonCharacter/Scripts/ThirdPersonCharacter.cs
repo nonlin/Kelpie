@@ -58,7 +58,7 @@ namespace UnitySampleAssets.Characters.ThirdPerson
         private void Start()
         {
             animator = GetComponentInChildren<Animator>();
-            capsule = collider as CapsuleCollider;
+            capsule = GetComponent<Collider>() as CapsuleCollider;
 
             // as can return null so we need to make sure thats its not before assigning to it
             if (capsule == null)
@@ -112,7 +112,7 @@ namespace UnitySampleAssets.Characters.ThirdPerson
             this.currentLookPos = lookPos;
 
             // grab current velocity, we will be changing it.
-            velocity = rigidbody.velocity;
+            velocity = GetComponent<Rigidbody>().velocity;
 
             ConvertMoveInput(); // converts the relative move vector into local turn & fwd values
 
@@ -141,7 +141,7 @@ namespace UnitySampleAssets.Characters.ThirdPerson
             UpdateAnimator(); // send input and other state parameters to the animator
 
             // reassign velocity, since it will have been modified by the above functions.
-            rigidbody.velocity = velocity;
+            GetComponent<Rigidbody>().velocity = velocity;
 
 
         }
@@ -178,7 +178,7 @@ namespace UnitySampleAssets.Characters.ThirdPerson
             // prevent standing up in crouch-only zones
             if (!crouchInput)
             {
-                Ray crouchRay = new Ray(rigidbody.position + Vector3.up*capsule.radius*half, Vector3.up);
+                Ray crouchRay = new Ray(GetComponent<Rigidbody>().position + Vector3.up*capsule.radius*half, Vector3.up);
                 float crouchRayLength = originalHeight - capsule.radius*half;
                 if (Physics.SphereCast(crouchRay, capsule.radius*half, crouchRayLength , crouchCheckMask))
                 {
@@ -224,7 +224,7 @@ namespace UnitySampleAssets.Characters.ThirdPerson
             if (velocity.y < jumpPower*.5f)
             {
                 onGround = false;
-                rigidbody.useGravity = true;
+                GetComponent<Rigidbody>().useGravity = true;
                 foreach (var hit in hits)
                 {
                     // check whether we hit a non-trigger collider (and not the character itself)
@@ -235,12 +235,12 @@ namespace UnitySampleAssets.Characters.ThirdPerson
                         // stick to surface - helps character stick to ground - specially when running down slopes
                         if (velocity.y <= 0)
                         {
-                            rigidbody.position = Vector3.MoveTowards(rigidbody.position, hit.point,
+                            GetComponent<Rigidbody>().position = Vector3.MoveTowards(GetComponent<Rigidbody>().position, hit.point,
                                                                      Time.deltaTime*advancedSettings.groundStickyEffect);
                         }
 
                         onGround = true;
-                        rigidbody.useGravity = false;
+                        GetComponent<Rigidbody>().useGravity = false;
                         break;
                     }
                 }
@@ -261,18 +261,18 @@ namespace UnitySampleAssets.Characters.ThirdPerson
                 if (moveInput.magnitude == 0)
                 {
                     // when not moving this helps prevent sliding on slopes:
-                    collider.material = advancedSettings.highFrictionMaterial;
+                    GetComponent<Collider>().material = advancedSettings.highFrictionMaterial;
                 }
                 else
                 {
                     // but when moving, we want no friction:
-                    collider.material = advancedSettings.zeroFrictionMaterial;
+                    GetComponent<Collider>().material = advancedSettings.zeroFrictionMaterial;
                 }
             }
             else
             {
                 // while in air, we want no friction against surfaces (walls, ceilings, etc)
-                collider.material = advancedSettings.zeroFrictionMaterial;
+                GetComponent<Collider>().material = advancedSettings.zeroFrictionMaterial;
             }
         }
 
@@ -306,11 +306,11 @@ namespace UnitySampleAssets.Characters.ThirdPerson
             // (typically allowing a small change in trajectory)
             Vector3 airMove = new Vector3(moveInput.x*airSpeed, velocity.y, moveInput.z*airSpeed);
             velocity = Vector3.Lerp(velocity, airMove, Time.deltaTime*airControl);
-            rigidbody.useGravity = true;
+            GetComponent<Rigidbody>().useGravity = true;
 
             // apply extra gravity from multiplier:
             Vector3 extraGravityForce = (Physics.gravity*gravityMultiplier) - Physics.gravity;
-            rigidbody.AddForce(extraGravityForce);
+            GetComponent<Rigidbody>().AddForce(extraGravityForce);
 
         }
 
@@ -395,14 +395,14 @@ namespace UnitySampleAssets.Characters.ThirdPerson
         {
             // we implement this function to override the default root motion.
             // this allows us to modify the positional speed before it's applied.
-            rigidbody.rotation = animator.rootRotation;
+            GetComponent<Rigidbody>().rotation = animator.rootRotation;
             if (onGround && Time.deltaTime > 0)
             {
                 Vector3 v = (animator.deltaPosition*moveSpeedMultiplier)/Time.deltaTime;
 
                 // we preserve the existing y part of the current velocity.
-                v.y = rigidbody.velocity.y;
-                rigidbody.velocity = v;
+                v.y = GetComponent<Rigidbody>().velocity.y;
+                GetComponent<Rigidbody>().velocity = v;
             }
         }
 
